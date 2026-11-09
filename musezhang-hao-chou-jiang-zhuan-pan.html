@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>幸运大转盘 · 免费抽 Muse 账号</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #faf8ff;
+        --bg-grad: linear-gradient(180deg, #FAF8FF 0%, #F3EFFF 100%);
+        --surface: #ffffff;
+        --surface-2: #f1ecfd;
+        --ink: #2e2450;
+        --ink-2: #6b5fa3;
+        --ink-3: #9a8cc7;
+        --line: #e3dbf9;
+        --primary: #8b7bd8;
+        --primary-deep: #6d5ac0;
+        --primary-soft: #efe9fd;
+        --seg-10: #ddd2fa;
+        --seg-20: #c9b8f5;
+        --seg-30: #b7a6f2;
+        --seg-40: #a08fea;
+        --seg-50: #8b7bd8;
+        --seg-0: #efeafb;
+        --seg-0-ink: #9a8cc7;
+        --seg-ink: #3a2b66;
+        --seg-ink-strong: #ffffff;
+        --shadow: 0 10px 30px rgba(107, 88, 200, 0.10);
+        --r-card: 20px;
+        --r-btn: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16122b;
+          --bg-grad: linear-gradient(180deg, #1d1740 0%, #130f28 100%);
+          --surface: #231c45;
+          --surface-2: #2c2256;
+          --ink: #f1ecff;
+          --ink-2: #b6aadf;
+          --ink-3: #877bb6;
+          --line: #3b3068;
+          --primary: #b7a6f2;
+          --primary-deep: #c9b8f5;
+          --primary-soft: #332a5e;
+          --seg-10: #453a7d;
+          --seg-20: #53448f;
+          --seg-30: #6753ab;
+          --seg-40: #7f6ac6;
+          --seg-50: #8b7bd8;
+          --seg-0: #2a2349;
+          --seg-0-ink: #9a8cc7;
+          --seg-ink: #ece7ff;
+          --seg-ink-strong: #ffffff;
+          --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg-grad);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+      .page {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 28px 18px 40px;
+      }
+
+      /* ---------- 头部 ---------- */
+      header { text-align: center; margin-bottom: 22px; }
+      .brand {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        color: var(--primary);
+        background: var(--primary-soft);
+        padding: 5px 12px;
+        border-radius: 999px;
+        margin: 0 0 12px;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.2;
+        margin: 0 0 8px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+      .sub { margin: 0; color: var(--ink-2); font-size: 15px; }
+      .sub strong { color: var(--ink); font-weight: 700; }
+
+      /* ---------- 卡片 ---------- */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-card);
+        box-shadow: var(--shadow);
+      }
+      .wheel-card { padding: 22px 20px; text-align: center; }
+
+      /* ---------- 奖品条 ---------- */
+      .prize-strip {
+        display: flex; align-items: center; gap: 10px;
+        background: var(--surface-2);
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 14px; color: var(--ink-2);
+        text-align: left;
+      }
+      .prize-strip .gift-ic { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: var(--primary-soft); color: var(--primary); }
+      .prize-strip b { color: var(--ink); font-size: 15px; }
+      .prize-strip .count {
+        margin-left: auto; flex: none;
+        font-size: 12px; font-weight: 700; color: var(--primary);
+        background: var(--primary-soft); border-radius: 999px; padding: 4px 10px;
+      }
+
+      /* ---------- 转盘 ---------- */
+      .wheel-wrap {
+        position: relative;
+        width: min(80vw, 320px);
+        aspect-ratio: 1 / 1;
+        margin: 22px auto 22px;
+      }
+      .wheel-disc {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        box-shadow: 0 6px 24px rgba(107, 88, 200, 0.12);
+        padding: 7px;
+      }
+      .wheel-svg {
+        display: block; width: 100%; height: 100%;
+        will-change: transform;
+      }
+      .wheel-svg.spinning {
+        transition: transform 5.4s cubic-bezier(0.12, 0.72, 0.06, 1);
+      }
+      .pointer {
+        position: absolute;
+        top: -7px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        width: 0; height: 0;
+        border-left: 13px solid transparent;
+        border-right: 13px solid transparent;
+        border-top: 22px solid var(--primary);
+        filter: drop-shadow(0 2px 3px rgba(107, 88, 200, 0.3));
+      }
+      .hub {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        width: 74px; height: 74px;
+        border-radius: 50%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        box-shadow: 0 3px 12px rgba(107, 88, 200, 0.16);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1px;
+        pointer-events: none;
+      }
+      .hub .hub-name { font-size: 15px; font-weight: 800; color: var(--primary); letter-spacing: 0.06em; line-height: 1; }
+      .hub .hub-sub { font-size: 10px; color: var(--ink-3); letter-spacing: 0.2em; line-height: 1; }
+
+      .seg-prize { fill: var(--seg-50); }
+      .seg-a { fill: var(--seg-10); }
+      .seg-b { fill: var(--seg-0); }
+      .seg-c { fill: var(--seg-20); }
+      .lbl-prize { fill: var(--seg-ink-strong); font-weight: 800; }
+      .lbl-a, .lbl-c { fill: var(--seg-ink); font-weight: 600; }
+      .lbl-b { fill: var(--seg-0-ink); font-weight: 600; }
+
+      /* ---------- 抽奖按钮 ---------- */
+      .spin-btn {
+        appearance: none;
+        border: 0;
+        width: 100%;
+        max-width: 320px;
+        height: 54px;
+        border-radius: var(--r-btn);
+        background: var(--primary);
+        color: #fff;
+        font: inherit;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+      }
+      @media (prefers-color-scheme: dark) { .spin-btn { color: #17142e; } }
+      .spin-btn:active { transform: scale(0.98); }
+      .spin-btn:disabled { background: var(--surface-2); color: var(--ink-3); cursor: default; transform: none; }
+      .once-note { margin: 12px 0 0; font-size: 13px; color: var(--ink-3); min-height: 18px; }
+
+      /* ---------- 结果 ---------- */
+      .result { display: none; margin-top: 18px; }
+      .result.show { display: block; animation: rise .45s ease both; }
+      @keyframes rise {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .result-card { padding: 24px 20px; text-align: center; }
+      .result-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+      }
+      .result-badge.win { background: var(--primary-soft); color: var(--primary); }
+      .result-badge.lose { background: var(--surface-2); color: var(--ink-2); }
+      .result h2 { margin: 0 0 6px; font-size: 24px; font-weight: 800; line-height: 1.25; }
+      .result .who { margin: 0; font-size: 14.5px; color: var(--ink-2); line-height: 1.6; }
+      .code-box {
+        margin: 18px auto 6px;
+        max-width: 320px;
+        background: var(--surface-2);
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        padding: 14px 10px 12px;
+        text-align: center;
+      }
+      .code-box .code-label { font-size: 12px; letter-spacing: 0.22em; color: var(--ink-3); font-weight: 600; }
+      .code-box .code {
+        margin-top: 4px;
+        font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 26px; font-weight: 700; letter-spacing: 0.08em;
+        color: var(--primary);
+        user-select: all;
+      }
+      .claim-steps {
+        margin: 16px auto 0; max-width: 320px;
+        text-align: left;
+        font-size: 14px; line-height: 1.75; color: var(--ink-2);
+        background: var(--surface-2); border-radius: 12px;
+        padding: 12px 16px;
+      }
+      .claim-steps b { color: var(--ink); }
+      .claim-steps .n {
+        display: inline-grid; place-items: center;
+        width: 18px; height: 18px; margin-right: 7px;
+        border-radius: 50%; background: var(--primary); color: #fff;
+        font-size: 11px; font-weight: 800; vertical-align: 2px;
+      }
+      @media (prefers-color-scheme: dark) { .claim-steps .n { color: #17142e; } }
+      .lose-msg { margin: 4px auto 0; max-width: 300px; font-size: 14.5px; line-height: 1.75; color: var(--ink-2); }
+      .lose-seg {
+        display: inline-block; margin-top: 14px;
+        font-size: 13px; font-weight: 700; color: var(--primary);
+        background: var(--primary-soft); border-radius: 999px; padding: 6px 14px;
+      }
+
+      .code-box + .code-box { margin-top: 10px; }
+
+      /* ---------- 抽奖记录 ---------- */
+      .history-title { margin: 0 0 10px; font-size: 18px; font-weight: 800; }
+      .history-list { list-style: none; margin: 0 auto; padding: 0; max-width: 320px; text-align: left; }
+      .history-list li {
+        display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+        padding: 8px 2px;
+        border-bottom: 1px dashed var(--line);
+        font-size: 14px; color: var(--ink-2);
+      }
+      .history-list li:last-child { border-bottom: 0; }
+      .history-list .h-code {
+        font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        font-weight: 700; color: var(--primary); white-space: nowrap;
+      }
+
+      /* ---------- 规则 ---------- */
+      footer {
+        text-align: center;
+        margin-top: 26px;
+        font-size: 12.5px; line-height: 1.9; color: var(--ink-3);
+      }
+      footer .rule-line { display: block; }
+      footer .sep { margin: 0 6px; color: var(--line); }
+
+      #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+      /* ---------- 链接无效提示 ---------- */
+      .gate-card { padding: 30px 22px; text-align: center; }
+      .gate-card[hidden] { display: none; }
+      .gate-ic {
+        display: grid; place-items: center;
+        width: 54px; height: 54px; margin: 0 auto 14px;
+        border-radius: 50%;
+        background: var(--primary-soft); color: var(--primary);
+      }
+      .gate-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 800; }
+      .gate-card p { margin: 0; font-size: 14.5px; line-height: 1.8; color: var(--ink-2); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .wheel-svg.spinning { transition-duration: 0.6s; }
+        .result.show { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <main class="page">
+      <header>
+        <p class="brand">朋友圈福利</p>
+        <h1 id="pageTitle">幸运大转盘</h1>
+        <p class="sub">免费抽 <strong>Meta Muse 账号</strong> · 共 5 个</p>
+      </header>
+
+      <section class="card gate-card" id="gateCard" hidden>
+        <span class="gate-ic" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </span>
+        <h2>链接无效</h2>
+        <p>请用店主发的专属链接打开本页。<br />没有专属链接的话，先找店主领取，拿到链接后再来抽奖。</p>
+      </section>
+
+      <section class="card wheel-card" id="wheelCard" aria-label="抽奖转盘">
+        <div class="prize-strip">
+          <span class="gift-ic" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"/><path d="M5 12v9h14v-9"/><path d="M12 8v13"/><path d="M12 8s-4.5.2-6-1.2C4.6 5.4 5.6 3 8 3c2.8 0 4 5 4 5Zm0 0s4.5.2 6-1.2C19.4 5.4 18.4 3 16 3c-2.8 0-4 5-4 5Z"/></svg>
+          </span>
+          <span>今日奖品：<b>Muse 账号</b></span>
+          <span class="count">共 5 个</span>
+        </div>
+
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <div class="wheel-disc">
+            <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 360 360" role="img" aria-label="八格抽奖转盘，其中一格是 Muse 账号"></svg>
+          </div>
+          <div class="hub" aria-hidden="true">
+            <span class="hub-name">MUSE</span>
+            <span class="hub-sub">账号抽奖</span>
+          </div>
+        </div>
+
+        <button class="spin-btn" id="spinBtn" type="button">开始抽奖</button>
+        <p class="once-note" id="wheelNote">凭专属链接参加，次数以票面为准</p>
+      </section>
+
+      <section class="result" id="resultWin" aria-live="polite">
+        <div class="card result-card">
+          <span class="result-badge win">恭喜中奖</span>
+          <h2>恭喜你，中奖啦！</h2>
+          <p class="who" id="winWho"></p>
+          <div id="winCodes"></div>
+          <div class="claim-steps">
+            <div><span class="n">1</span><b>截图本页</b>，把中奖结果拍下来</div>
+            <div><span class="n">2</span>回到微信，<b>私聊我领奖</b></div>
+            <div><span class="n">3</span>截图和<b>中奖码一起发</b>，核对无误就发账号</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="result" id="resultLose" aria-live="polite">
+        <div class="card result-card">
+          <span class="result-badge lose">谢谢参与</span>
+          <h2>就差一点点</h2>
+          <p class="lose-msg" id="loseMsg">这次没能抽中，谢谢你的参与。<br />没关系，好运正在路上，下次活动见啦。</p>
+          <span class="lose-seg" id="loseSeg"></span>
+        </div>
+      </section>
+
+      <section class="result" id="historyCard" aria-live="polite">
+        <div class="card result-card">
+          <h2 class="history-title">我的抽奖记录</h2>
+          <ul class="history-list" id="historyList"></ul>
+        </div>
+      </section>
+
+      <footer>
+        <span class="rule-line">次数以票面为准<span class="sep">·</span>中奖以本页中奖码截图为准</span>
+        <span class="rule-line">奖品共 5 个，先到先得，送完即止</span>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ============ 转盘数据：8 格，1 格奖品；中奖概率 6.6%（见抽奖逻辑） ============ */
+        var SEGMENTS = [
+          { label: "Muse 账号", prize: true },
+          { label: "谢谢参与", prize: false },
+          { label: "差一点点", prize: false },
+          { label: "好运在路上", prize: false },
+          { label: "下次必中", prize: false },
+          { label: "就差一步", prize: false },
+          { label: "幸运待机中", prize: false },
+          { label: "明天会更好", prize: false }
+        ];
+        var LOSE_LINES = {
+          "谢谢参与": "这次没能抽中，谢谢你来玩。\n没关系，好运正在路上，下次活动见啦。",
+          "差一点点": "真的就差一点点！\n谢谢参与，好运已经在赶来的路上了。",
+          "好运在路上": "好运还在路上堵着车呢。\n谢谢参与，下次活动说不定就到你家门口啦。",
+          "下次必中": "这次先攒攒运气，下次必中。\n谢谢参与，期待下次见你中奖。",
+          "就差一步": "就差一步，太可惜啦。\n谢谢参与，好运离你已经很近了。",
+          "幸运待机中": "你的幸运正在待机，还没轮到开机。\n谢谢参与，下次活动再来碰碰运气。",
+          "明天会更好": "明天会更好，今天先谢谢参与。\n把好心情留着，下次活动见。"
+        };
+
+        /* ============ 票码门：链接 ?k=8位票码，SHA-256 查表放行 ============ */
+        /* 票码哈希表：SHA-256(票码大写原文) → 可抽次数，共 800 张票（×1 500 / ×5 100 / ×10 100 / ×20 50 / ×50 50） */
+        var TICKET_HASHES = {"221c80d5071ebba84b6a28a07688eff02b84b3686b7711f8995e1f7b3dcd0d7f": 1, "f8bd3493bcb4f198d8d43044e9da2c690e2b8294aefac23c049de607ee454d47": 1, "ab01b2897018ece53b7165715008f6a3e9c77ce6ba932f45df2b3177e5c90c22": 1, "a79bc3cc49b18507c730bb7e42a4c5c11bab1fe5c5775838f32fa2d38c114dd3": 1, "e8582072ef3a7ad400ff70bfabe03b7a0ce5832d77551fd01a6a3352033e0f70": 1, "b280e38b1432068d796ffae6ac831dfc8ecae929a50f9f2b8eb59385eeef6f5b": 1, "7eacd6c239d91b67cfce2953e51b5091baedeeeab7e8c81b2aeb93fd6cf56a36": 1, "ac1a963e6ddc762491a1e73b63d3ea6a8956820d49bb4960e82529066c33fc42": 1, "cafcb87f475ebb469625e3a20a1ac871268f19021b4e0e41a0d8d8ade27c4112": 1, "3f1fc7151c0b034694bab378533baa0c4219192088905b627dee9773b7b14349": 1, "5455c481f0ff532888c6ce091eab12a932e58b06ba9fd2a4ad63e03a524c0349": 1, "c175ee859f9204682f85f4365328ab85b411d3ebd7751699e2d698e3f1c9e230": 1, "3e1c78a5a05c1044fbb74a24c93b328cf56c3abbf56e1ce5bb11d96a1c7675c6": 1, "df86075d177b70dc6515fcb547bbe42cec0efcff05dec08567962a16c1bc5e58": 1, "0ef07d3afd165d39e70a9546354b21bef85a891258a4750053a4848a7dc047b3": 1, "ca2e64771b382c4c23eb3190f4d2b4d59eafeead4c0f9078f83069721daa618a": 1, "07522cd4db44419836c28ac31fe8817e8be2a7e4828d1692c6bbe5a4a3715c11": 1, "1b52bda215db70403b294999f72c571994b6263f0d803f9e57453d73423a532d": 1, "ed945ac8b6f41d3607d23c44f0482046d321e008d140bd7bc1a471383cdd2006": 1, "0a4d21e3269fc1f43ecaaa4ccecfb57dbce1f4dd35886c2131a8ddd81302aa78": 1, "3a038302ae1b61360c4643b087e9223a46e69daf207c631bcb15846a421190ce": 1, "cec69dcd8938eb9eff8dbf77c6ee83440dcfc59763943ebbfddd00d5a78c4675": 1, "aebb12950c71753a895e98bcea964aea9f955eb8c47bca3fea2f0dd23b619f2d": 1, "bd114395edfe88feae3c2e9d721560055ebf1629867ba13172cef6a7ff1341ab": 1, "59ecc374f6b1deb59aac392e0cc5b6926d424f9754a55073e9c1fe27b164fb94": 1, "ca82a8328c6ed2343201f8eff99620406bb577eec3108cd245f18e78cd51a564": 1, "38f21206d8d203c9641e9495845376617f1bf8a972fcf85327fc0011c4ec88d6": 1, "d481675608b03755d77cc1dcac0a8b4d53b8f2178356da4f080e7e10d9966e9e": 1, "e3e4be61ed2a8d0de1ba4ae3986bc057b9174663f8615e168367fe9ea32237f5": 1, "050d4fa75c945fa1fc159993cfbc33fc0248448b90222fc54ee7ba55db282d10": 1, "fe97dd01c19e48f052badf58f72cbd5a9e005f18946bc7ccd441387fa8997d9a": 1, "f360d4260b6f99bb6997fd93c1ba3c30049e6bf90f6aadff722a55e0acedb8b5": 1, "0660bea330ff7b65f073933310cf12af775687e1142c26d3764088caf878e321": 1, "c24e4aeed19b64b20c34559bd5af7d5bbe490e84572e2d13f5c02cabcf9ec1ae": 1, "60b5c3ed2ff0949ee4b568507da438c499c2a6ddf0d4a4715a4148638233eca9": 1, "48d7fbbb7bd3fe80bec088a541f5d3c9c7f54246d6cece1a5491e922a48fcb38": 1, "09ea39f999dbbd0406ff0878f2785294158d929eb3cd861b1686585c6b9305c7": 1, "e1c8da27d01cbb9e0bc8dbe6f49a0007a3d0feb81adb75d23a8a2f5202af7c49": 1, "22fe2525b4341eee7db6cd9e81c5b395163bcd75987c93fc64c429b20f3bc6f5": 1, "686c285422a893faa8ab4d9516ef437b617a1d597f8eecefc75762a1c042adbd": 1, "99d125ed791e31798143fdf319a59ada8d7fb12885d747192629264b25223a75": 1, "3549a80ba7220d63f0dc5ce5de45b1f572ff9d9c8ea2a2cc833841e154229d96": 1, "e73a99b50e0fac5184796c581b7a7a320db2d4288453bf86b51050adec321972": 1, "75c54c745ef1c68c5ea82de411f981cab0f9e913abddcef871a0e059acc42759": 1, "c5b96922a3c3af615d4f636415e51972a96ebce3626a8dc52a8c4074eb51662c": 1, "ba8b2b013019bddc59bdd5660a207f0b0105d7d0b362dc350fab3f44a25e8639": 1, "853439a2465f61e7f8cb3bee610cbf2ea0a09c9f7ecd67e87f3a74e02024f49c": 1, "52e99d3974b2e1555969f53903cb652cb1235a872af3ae5e7884fda81502df21": 1, "423bebeff2f3c16ca2bbee4f03404dd06a7ecc996d52fd5c69c6a25c2567592a": 1, "f6a84a9d6b31b2e76899fcd9d2e94995add1adee56fc389873e84304faf3233d": 1, "4b5563e986dacdd486d2eb0546c72b7b558b3606e640ae1f7760ae5c8379f63f": 1, "ee423724af3f235380905b15282e1227c6d07489da63443ad468464d7e20dd89": 1, "b624c09f6819f67ef1654b4dd07766bf165386e39a356f86df440285e5c22845": 1, "c94ded62b8b048b81fdfd3fbf7784612bb7143183eaef4aa504344cb445e0b6e": 1, "4f924083c59131201d3b2f51ec460de57c0588f5e7669f6c1b1491923c295643": 1, "1c02ed5b74f843f5976c926e9e74507061f42c887b572412e06294e5c33f330b": 1, "c8cd3f6b1cb15f2b55e3c094116b4f887bd1bd850a7924937531aed8b5a99ee5": 1, "a8bbb2b0e4a9d7d51d896cfd9279a343f08e79c9cf73a38b75808e75dca7d581": 1, "78786e833a4d580020639e4ee069470c943bd162ed97664198255366284f1b19": 1, "1630899a87e3a7f7901e677c4715a38809e27f2f3c606802e6d5a49ad4ced620": 1, "13b2d2becdc06a8e39d5779992f0cb6d384a9d170011cf6af7b24858464ff144": 1, "7d85d1e2c31cd8ad7102433a09202d52682a6eb26952d036231e48e230e8164f": 1, "264e13ff315ed7dde8f4ae102fb3c857153fdf47e4c6d545d392b28cde04585a": 1, "a9209a7c3ebe02ef1faa635e0ba82dec02542f76244e147fec01844ada2429f2": 1, "bf44ef8c4a9acbf11353a24511f85e6d7081fe1faafdfc22a87eceb686295947": 1, "334b1ebc96796d87f2cd841435b4319190b78d6ecfd3cad68355a6faf0f1fbfe": 1, "4c546cc51f166d555db20e32ff25843ff46c14e558bd9d33ab881d51bb0f1fe9": 1, "c663857e0f215c7fa667fd6fd89ca60358dac7d1fd3feadaf5147d2ba51121f4": 1, "c20f49fbaac2b955eacc56bb988cc6ef9591aa9da2f28666ec788da3d3e6f7a1": 1, "f453c0226b5cc8318eb67293dd9472419a1c174374ad7c4be4044ba23de58a92": 1, "5134eb783730a6145b117ac3ce9effde8c45b4fb5d1ce9fc2bdf3fde3f7b9368": 1, "41e227fb22bb8a494350c499aca951a5ef9766dc3083f67be6988e454939a5d3": 1, "e6705638844095d4fd55ac7950203c9aca1d1255ced85e034190caf8589a1978": 1, "a9d526eb2b2c7bb44cce9912e1ab3ba81439eb7aaf1f427645cfbfd567c20e60": 1, "f78746510cb5b9daeb75f3b40b5111c4adef73c43868681053ed0f74a8a658c9": 1, "88880335e3f228c8204c1787f7f63b807cb10a2ce3eed8b531f2a66fd2f1a497": 1, "d88a5314f43153baecef2fc71982e55c0545d553b860cc1c9968bb44dd1d1c4c": 1, "6e53b55135590bed43bb10bdd7f12d6167a388acdb53b376edbe76a95cc9ce81": 1, "bdf65f6e21d9818a256d954bd5973499b78fdc5f6b66561d527ba3029ade45fa": 1, "d63af5c4c62385c2ae6b54b8c4284b5d14946d6a7cac34665077e92065575190": 1, "8e69f9afa089f4ca356f4cab9624cfaf3a7d576b9ae36ddc04aff01560f297bb": 1, "4aaaf46e42e840bee8e085ae43463efffb7cbc214f8744fcde8d7fb810cc1b70": 1, "1e1d25f485e84c6ba4e0ebf6800b461c5719813a88ab43f8ecf1cbd012ddf317": 1, "9499f7d1cc3cce346da542905ee6426d8287697a70261bd0f4c2f83c1411db3d": 1, "5970c0f98af46945a1ba3c5a8659623ec7eaa634b1a0ab15023c84260b63141d": 1, "50e51c3b1450629a3e95adb20a5fb29496fb2ba2b36e35701a5a20fca4c24f15": 1, "d8f89573e8923c1cbbedece922790588e391456741c998c2d1a6c19e31706280": 1, "fc100a3daf99c624c6f86febf2973c87b40a4ab0e634d816d81e6242bdbe0b89": 1, "43c5488e139a7681d369c40dace9680ba8751cdf3214ccb84dbe36ea4daefa1d": 1, "a4a7172964e1738086064f22e050af95ebae6f80d1efa46f37daa4c1f6387c67": 1, "bb93266bac1f07f658241d33b846ad429dbe2d800ff8cc179822f5bb2448371e": 1, "3ddcbac867381dda8ea5be380b5c795632c2ced3b8a49edee8411847bb4c759a": 1, "a26c56c1725f96ee5c46d7f9a245760501f7f18e8931a3a071133644ef8dbe16": 1, "9151de8b46f56a93ee8ca05bde7c87e5287e9776b4cdb93eec683a74200737b8": 1, "e0205494afbb19bd91fddb2fd66565908c6db7a32d457063ddbda165a0082a5c": 1, "1e5833cc3daf572fa516624c15bdc84dc9c25b9d6992c0f3de75fc981a835bc6": 1, "99e6dae7d36e65051048976afa1e3aa60583f75455fb3abe23f8c93e30f2c59d": 1, "f1653478d75b327bd071dba9de9f2dcf04d456f22b582a86d3a5f09076dc616f": 1, "bc613f038ce32217401b4e853d3fc05272106983894188a518f492b21ae3bcfb": 1, "2c02120f5a2bde7c0643ae1f8ba25d0ba010afea28118f1da09e3389f3d4c5b8": 1, "20a6f4683c1b4fc4b2787c054e5f4f0b6b1af47d8c793f89e5dcf6168f159396": 1, "9b6c22e65acbfb892e992fa38a2a5d22d846a21c3bf8d408661c74eab38bf02c": 1, "f1103e94857eb1e62e3a2b0f8cc81ba2538707b349a00c757b7a31474021226c": 1, "92e8305e3271a8ecdaffbb741798142fccb302e4aaa1f9f45c8e9cb461a54186": 1, "2568ec53a4282f8c4b11c86887c32258dde88e0a76988561e04191e44a3b9332": 1, "2a2d95e28e786db434a7b80080a19843b548798fa696eeb184c72d00e44d72d1": 1, "e57800fd9fbc0ed8fd6faf55340e537142a921be7044ff93a8c61d40608ac95a": 1, "1db37c5ef600ca5480202993a36b1e46687424ba6d3f7aa52b0b44403d1ffd38": 1, "6794ad51e44c827f755c066a34a00f333f3b81cfea20792d9916dbf24ead37e8": 1, "dbb468a1ca2b5acf3d0a27be38795d569bdc267adbc1ab5055c0832a3214aa12": 1, "dde300e2d845e82365a4166f5dd17944347e3ff5341fad2cd6e568272334d0a2": 1, "90a46e5b32f23121d59adf0f845980767a351c4bb5beb0f0a69c124baf0b1d2f": 1, "b8dd29423c84f781fa7746033b6885cd6fd8caa15bcf9105aae9fcafd9935b16": 1, "fe807ed0655a30135106dcac49cfb3856c65100485542f1352a1782266b5a15c": 1, "356b409b677e74ab714f9785672795c7a57161262554db5261820110fa62869b": 1, "754c396f70239002af2cdb7b91285d0443a03d47e05b35d9326041dfdd22883f": 1, "91a3b3f38d92c39ac01f3041674a748751d9f0d64bf14f1bcb3198dff8323d8b": 1, "880b93872d7e04c4b12bec987f047d162ab9f294ea53b4043bef7b565f52728b": 1, "d0e73588438331507f01b130491f2b0624db7f6d554d120801dd042c428394da": 1, "79e2c053ba2adfa93d2042c841309e4ab50d2b367ac161d4203a359ddd14ae5c": 1, "e98f1ffcca9ae1e00e84db689750d141cc215d6ca658bfe841aa31b41db0aa41": 1, "431e14a3567f6983863902bcb44c0e322313ccadca26ba9074ccfaf0252aaaa5": 1, "b6b34fd680d9aa41fb37103835bc2ac7e566dbd831f7afcdba50d8a0d4478123": 1, "a076eaf2a5635a45aaecd0a14942d617c9e6893683c3341437f96db1307d09a3": 1, "dcf3a6094282248b5d0a0270150f4f93646d435d324ff26274dcc33bb7fa6484": 1, "86f61c9e223db4d863114449f6894d6501bbd54681498a7370c7097ab6f81f33": 1, "5174b2200cecc024c9964432b3cbf5a666a21d440093b8a024f53df590260098": 1, "4ab018784748ef66b25d130317704806be670d73312e05c07e9b61f59468ab06": 1, "edab5bccd68a5e444bc38c4dcd76a124c5a532905d0d5cb5d3f7c01d9606b296": 1, "e8db8719bb146e30231e9c6f689dc63ab3c39a11682006a1c98e036dded03590": 1, "ed62eb17c20132db622d695bd91910b9085da2bd12fdc66cc7b2c3352b23eb23": 1, "4cc7db3ff1fe522d1518b3c933be6b5d9106076e137c05a52133ea79e7eccdb0": 1, "c6a755c97e536240c19037dc0f392dbdc3581e8d9ba323d9c5c9c00459426c93": 1, "f8542b77016d7cab258a7c5542c7f3f4445e6382021fd05f526b706e0832cdb5": 1, "45d6deecb1c272ce8616e2058fcb32bcb9c1bf62472156f9852a8c288acdff01": 1, "185ddc5c8b569764a2cc496ed6bb720d623bdb5105d89c6a547ed424b5d93781": 1, "229ed4016882789d6fcc5a5346c7a14cbc9e822f6846ad05cd4eaec3f9a5678a": 1, "459fbd55b5018b603869fa8ab0c43e20119380efa0787d3a6722f4978b26b751": 1, "b2750ef6fd366c52a45ad7feef3b8421fcbc1d2d8785ee4e02241fda3c076236": 1, "409348c5848049f9ea430a63486b2ec9cc4e257e22b2c4caf988d3e1f01a473f": 1, "5ba31644fe9a1a4a6da983e85591feea6fd809680f79a22d09f3f8fa686161ab": 1, "5dceabc1cac0c636ff98bb6f9647dec84c7f84b07d8ab62f7685af0603af6491": 1, "ba5c6a4edd96cb274985037dda0b34ba054691c85b5566146ffc08fb7ad1ad3d": 1, "9461de45d58e551d092eed1e1239983c64b5af651078c2be1fd4bbe9526aa017": 1, "f02b0e514b1f02ff728669d17ee6d9aee8f13edf89282d4180b2a45cc9608675": 1, "09334c0d63956386694b1c8638c2ac61866907b1ca3393cfd37f5d465ff7427f": 1, "c1a40bc14eb291fd36695865d407d39b6b327f61eb8462fafbbb3ce48779bdca": 1, "d26866bf3732ee1aa81d61cc483d5787fea0c350d15b9d04377919d0ed9632af": 1, "9584efd5c59ea55d2e12287db6d2716a72c76801fea31606bebc5ee1c66f5954": 1, "76da0e9b6421f5179d6fb2b7f3a50b4784071899347306d11e4b4fef04f1ef53": 1, "a82cce3e4048e059c728a0733db5d83ec39350a9014035dc6c6b1f1fcb55fb2f": 1, "942f0a2a60b717a565aba5bee7aae161e1bd4cbafc2d4a9268cffc6fa4278ec1": 1, "eef9010ce499918779ed4ed141395c77cd7de333248092815dd48bdf1d25484d": 1, "53e049f7dd088ccff6ad5062fea40715d593295aea00d7c9ddd1f8f5b04f9740": 1, "ba91ea6048a808a150739827fd0d0d25e01f1a46bcf269f3f510e955b7a5c6f4": 1, "20f9d86b4a46f4bbb8fb69db5cb66ef06d1d4fe40c288844238d4a88b419c704": 1, "f406524423766fae1b1a682c7df1e1a25fe7543ecf8b69e5ce6c657b43e753df": 1, "a80f8525e93d524920067825dad136a0e0eb71e095f5b2331889c35165be46f0": 1, "85b48b30eb5b2a6efd96ad1b24fde090c980c0de56a30b3eddcbf99e944bc87e": 1, "84ec310771e8bdbb7582f633e39f21467c35aca08234f7c27a9bfb9905e2b9b0": 1, "c5919fcaf83e63169a0a08300f3d5f7e3207b275d64a2b1e387ea8d84a2bc6da": 1, "c029c03f18ba2ee9674adce9cf949f87ff8c3aa19ddc24b5b1bfa62292d54fd0": 1, "e850ed46f6f13f8b7eb4eb05a54cad4c67f293b384134e999d61218bcce14449": 1, "30dcd839069ddc405a78cf959514ca45da46b1b8ee7474e6af0ef37eadb3326a": 1, "b3b65cf0861686a352008ab8f55c4c859cdb98b5149a6bd1233d3d2e5dfd5a37": 1, "4b2709f6814c24ebe27bf2bfa70fa42ad803515a0cc36da3bea9b9b87cb96648": 1, "3c54869f2615e0a2c59c560f9dde18777966727e6f5c344ebbbc2946c9127a35": 1, "e7c3733a5dccabc0f9dfa71f6643b4ab7f9f8f3f7b4b87b5d345505826953d3f": 1, "4689adcd09591fef97e6ca084cc3a7b112a436efe077f9c8f52fe9e2cdf5e299": 1, "25c55f05a6f5717462a242b49014db98c594d840403c3161f6e8a6da47da29ba": 1, "d7a11a7cf0a6405fa6e331b38666a55c859870b1de948719fa7a72c46ed76402": 1, "773c4e3b0514d11baedfd131a8556ed4c213939173fa6e7b2b2d76745fdd230c": 1, "ac909c2cdcff0367e607928914611e103554686f175cce803f21059d28499b7e": 1, "c3c662f66f353f389c8bb38d64e783a04c9700d8e82ac355146db88f19aa0b61": 1, "ffd2983d7aad2fe2764102a143617a79298fd87e6e7877e8a486a51f63e41006": 1, "dec360b137be26914f0294df55ef3874ca8081baf5d7e33708d5520dd123bb72": 1, "2779916e5616af7f5a1b64cf7fdc2c514ad5a15c0ad9896e3dd6d9e3eee2ce95": 1, "7dde4c02b90272a7457e90a393cf7f32a6917f0c45bae5800e147b2a3516c362": 1, "614488bf589610db245873d35cbb2e849d4f661aa8902d6fc103ac6a6bae7516": 1, "47d0dd35b092cb8407fa9d500dd07dd8ad1ae400ceaa51c1fcb38a661ab8dd15": 1, "7c3a2f0e2b93b5d4924e0e93de403f4718848fe0ba04e99637025cd58fb31498": 1, "b795970da922c0e6ac1c7c4668fbc45378ffa1d4dc91d708f3e7efa098974a0c": 1, "c070c5f18f41be09be59af7bc5417bb98830af4372cbf7ff15803e5c3af8bae7": 1, "b8df5a6d1583956385ea942f4b21b95bb3f3435f06c4709d8af7a282206bdfdb": 1, "42b11ad18784d056d141ac6958584c726d817f491944e9054a0a22f524e5d710": 1, "818da0639a5c05ef8b7a9555f5c36c2edc8817dfb7144aa95f8d7d166c3021b2": 1, "b9cd2f2494c90ea6ef465ca5390a8b2cf9ee9ef303d847c25b112955d4fb3b96": 1, "9b0089b656417ddebcbe8e5fd14c2d2e5df605a0a8e0d97d9a94645c03787070": 1, "e8544e6eaa3d7a71adad970f343b2287b769711a238750a210fb8d88d37e577e": 1, "38ee31e4983e6acfc6ca13bd89f7d35658742a703f41a3809c76a2761dfbddc0": 1, "7c2327e29bd58337dd3bec8b2a777095402d7d1f13ed154d028cbbbf895afa54": 1, "965b3446cfc00a7acfa94d4b1a2900582c49658dc892e5beebd0269ece0efa30": 1, "989373ce1fb0879feeb6b2cad4fda6cc1f37c32cc09b77366c3d3f5b6ee9b7ce": 1, "7c668d6c958e942d063dcba5ce3a933fa8c761797e028214681313e46b2bf9b6": 1, "ab60c0b0abbe58503c6a750ca241f04028865fdd4558abffe877d9ceb913c311": 1, "0ad1a1ee41d6ba1c0ca35f1a397a71fbb5602b449c14ff5b6ca7d944fb5fad2f": 1, "18e6b456b5ae06d66f816b63cc374c079e947a479a7410d0fb12c066d8701d04": 1, "df44e9e0ada020fa52f3d51d39dbb4c45cdc9b374f7fbd27e79eebc23c358122": 1, "39b34a004e5be12451f321a1f849dab8e901ffa2e4f3241bb875bd78c9d1a5ff": 1, "a9b64a05ac4810a1816be3a9b650547ef8def1031f8f32cfc5e06c10cd827f3f": 1, "7ec0797f5c9de4d326fdd1edbd9db274b1224df886647288a5f308a9832f0de1": 1, "0c77eb5f89425ccf9a5705b1f012ebc2d081da8bbc8887fb11b2a0ce13f506ed": 1, "27922edaab104c516db333e76179d9f9def0d8062e5ce914787deca619ae6533": 1, "6f488906eba34ff5b6a766f528c3d822c92e1d7ecd7b32d80c6ca39662c586e5": 1, "ea92b61371b6ca7b89a816158abb7f48b1aa7f01a73f30a61226aa741d8f9003": 1, "f4f8ea8a139853d08856d18d735743e1cf3dfc9b4b5a312015be7626b4c0ef9a": 1, "59ff98a12d9e79c9e84cf019c3553846cea36173c7ea5178c58b712e594aab57": 1, "c6a4ed8801e0eea4a349853a7ee8f15454012323ac9690e8e66c7361e3986743": 1, "4b50f7844a73b72ad615470323d4a439941c4e07ccbd06d6e2c867d75c9272a0": 1, "eee390bf3cc5dcc190a1f07b4f2d26e4d6a032e193cfc4714858829081d83426": 1, "ebed6a4c2349a8788c654e1574b8e064d984960766e936ac070bc9f2d0f317fb": 1, "67b05efa0f8e2f4f2cd2a06f57ff5e07b037a9ac9154d95800144f082aadeebb": 1, "7cdfe524cb405a14e6b85e23280679f6037b5714261048ac957342a68907b1fe": 1, "7e76ad8d9e3f878c04325ba3c1362123860437703ac7c396897a6041bb286f49": 1, "0b4180582057589f7625638184680a70b2c9516ca64517d3e0e13f627ca78eb4": 1, "50fc4995d334bc2abbe20cd8140690947fd28533413011c693b9babf9beb110c": 1, "f061b9a5c25ddb26688d9350ada70ed64e31423e5d9e4a57512c07474aa6492d": 1, "b61123408d79aa72c7b3e524b7535173b36edbfd2ffbffc689fc63ac4b930372": 1, "5533d9dc442968f7ca1dd2f2cc8478b775902e56b1f3898ae34a5fcb5cf07ecc": 1, "042918c67db163c1d579e3cdb86e88fecb52a5083072631515349b6b1c81e856": 1, "be9110673e8fb982e1b737e78c505b9e0ecffc28c856300286a418652abf085d": 1, "392d74b4b833614758d25922f961839e4947c96c7bca3937aca15ff56c645f8d": 1, "d8d8b3d92bdf62eab7b8d75508cf16cd3c69a589b161b425d14ffd93195446cb": 1, "a39f8ea8e8992e96bb2959dae276f3fa4a24f96db07457d6cc76be7e3d2f0967": 1, "646f5f483b34f0efb3cea2d731c947f41fad1c61aaa5751d5792b1ef1ec48c6e": 1, "b215a7f4afa3c8627977af997911b1d1412dac11bbcdb4979e30b1f4024d68e2": 1, "3949721bdc23408caccb62175831d8ab63aab27e81ad9aebb830e39d44c05812": 1, "67921572b268986d8e6a7e38662668a2999b9fc413f84c0987b49cc7fdaee47c": 1, "3b964b6828cdc9c3ed4953e4259e1bb847d33589191979aa8e1a2b4959b5ec00": 1, "55dccc66bbbd78528c54dc6b22119ab65f9a72aac7c51de6a0027e96c73af545": 1, "c5552bc98851c1cf54543a6aeaa8bbcc80f5c364e6b774eaeb0d7b6f778ddec1": 1, "038f00ba8565ae8c1d1b60a8aa51a15ff172608394d5832471facae2b350dc3a": 1, "2d37d2f3961ca3bcc00be86c591ce1c62ddfd4e690170c8d7b4b4f61eb41b138": 1, "3f968677aec58ea12bb081f20937d544690412cdc8b914c4c3180e30a4f476a3": 1, "38f124e5ab42f9fbeda88eea10fb1be52df2f65ce7ee4d2c543140666ad48693": 1, "0ce42195378538917fe613df9a5baa62125eba8404bf3703ac2da35dec435247": 1, "3e4f77bedda3a0b4d9058dad890a8443a75f0b8656604175ac5791da0893d947": 1, "24bde472789aa4c17d69c21668366e2b602ca0d1d511b7273203043799cb9ca9": 1, "8e9b8c5ef19e20ba76f1954d2bea0654b2080612c7e944e3fbb038f642803f9d": 1, "2de4b902f2fe3d4190e0151f105b39a0a07492e3ea94f32057678f2fd51b8f98": 1, "0f18a351b3e69e984bbd9cd59de2be79e0ba91bc72c979d6c61929dffec45b44": 1, "7d2f8387d8ea4e32a956a64b96a81ff2f6feeb3cf8d67484e7be2852ac3afd6d": 1, "a368cf6f775188510b2d100628cfcc2df633106101347b652660bd85ceb7b168": 1, "f94ee55d1af351dc423956c4208b737c6e3bc6f81b14bdb7cb8f0a9fb1567037": 1, "e48d9168f422c08aa282b7bd1d8c7366395f5e7f92f53596696b17df2cfb3ddc": 1, "b4e9926c5e15985e634b5efb078b0b855947111498ae6cc20fe6665c4bb340b2": 1, "16effe0d0032eff8ed54a2d40ac8a9f5da27c2b229b02fd97f48bfcda6b477a8": 1, "0b1af7e713baf97bb290484df78cfde647a64b82404dd0cd280d188b3d4d9733": 1, "722f17c699138540adaeee834e1915eb3e5264f108712ae3ecab7d70879ac4fc": 1, "9b4611bea761433ab2618732a18e7b0dccb82e6648636d6863f891cd218a68c5": 1, "a3c42874738f716d2ac40e269c6c3854707af0c7476c3b53732ce50990431907": 1, "90525261fbc0df07a11b39d506cb7dd8ad43dda5d093a65e003465aaf72720e0": 1, "677172965fab1b35ea2258c70dabaced993499f54ddb730087da618b10081ae1": 1, "4f37f101a9952bdd3a7a4681a3b983865ef9728cecece993b33dfd62511d28f1": 1, "e8046b85a3744cb1d7bd0e4d05e923be96467afabb50d3c2f07715c92e342b9d": 1, "436d52fbf8e46023f3ddb2c0b45428b98e37a029f5814345e9f021c661103631": 1, "a0dc06e3007b08a33cf14409d5d5ca6c7a5005f7f0c28566756621db87fa458f": 1, "58da2aa9d7c77f67f4abffb375ac3cb93af91bb980cd93dec478a3f7a6b175a9": 1, "0613aa94d3f337836b69ae2d787c22ba21153b2e2c51367d0625d9b5fba5725f": 1, "f420673283ceb84b905cb94da730b366be0cd6abfa382f95e7645b19c08a6347": 1, "187ea2914205dccd9c40978a0b0cddee0ea3df1e125c19b3b0f4637bc2a653c8": 1, "36f8f85a533ac78d8a1bbc82a9a55902c88ef54d514a9082619e463d668d2b06": 1, "84ba6a017f3f31bd95629a719a87604d2f577cc0caefff618001c506d1c6e75c": 1, "143ab0415019e45aceee55dbb77f57078595d9a756d457a89e66281477bf3ae4": 1, "f799471ea6bf5942ed59a32bac88fbc1118f51359fd137ef5565d281e1b60aba": 1, "4af44443d96f037c03caa1a10554e05bde6bf691134323a246ff065f8fbf15b7": 1, "ee0f56cecc9bed28d62b43f19633bab6c276c93c48f27ff42049833a5a9c7084": 1, "448abf9448eea241b5c5ffa1ea1540abd44358b1b99abbc7e2caa15cc80484b0": 1, "5c0c096a3816c9d2d55818ebf44a86876ca3f0fb2e6b253249e7681ba602eecc": 1, "0112819a809b8f55413f77c69c3eb6dacca7d7ad7d003df4141b7ea909bc5584": 1, "aee2bc6f59f3563497023764c4ad809cb7b72b2c308e365259a45b1552b0c250": 1, "cfa471d2bc576127d3bd046daeb1024aa9b7103c3bced4904ca673b75b845edd": 1, "81282c50deb203a904c87cde72b8d011c3c087033a2975973fbab2036bba99af": 1, "a7c4cad0920bec11f6eebeb4a489963eeb916ad1b3447dc4cb806de05b4d7d72": 1, "6a87a4882c56e2488b24b6a9c9d2395ed38aca0cfb5e9d497182a56116a69c46": 1, "657fbd2835a2d77fb9b2dba68bca4e52f21f3ecaeeada694e545a818855b3650": 1, "86b20a2dfef4311755dac20393c942e7b1a43a67c9a18752b370ea0ee5c6ce15": 1, "406f5f9dc11225969a72c1a035f90b67ebe3ea2fb954c0d3102979ac9d2f3521": 1, "a7b10458c6d38fff6c74b9136a6f574083dcd0c899304c008f4851f5cb42b7fd": 1, "f87225f2816b86fe99fa9f064ba9e013430f9c3c424438ff8f6371e767564402": 1, "d392b25650b7aa4ae904d1552e1244c12deecc5a709a4330c90bf2c751b0abb7": 1, "4749ed25d9af88add52f3234e066d442352e923ec19f39e671956c7f72af37f2": 1, "14ea8fb018df9085e826623a66d29acebcda2813e9c729fd59f50a94ecd991a1": 1, "a4dd1778e504a7aff4a8166c512695076248389aaba9a4a2690d4c45bb58cae6": 1, "f83ba9523632784660f5bde0fe17e1c832b472868113beed0b8a46a4775e3589": 1, "1e0e12a667c63e2954e07372c46c216c3496aea07a8283b69f05232db32ce68c": 1, "2442fbe4f475b35afeae9c5573936113e94e35930de832ae57c7f27bcef4d2d5": 1, "f748460621ab5e58e752fe3242cb633981bcac342fa1177016084bf32d646c1f": 1, "b7a188666774b7efe49345321069f26f99e45ca49b3d86ed977dc794d6c204a7": 1, "c57fc9fb1a4a2ba0332323ed08076196060c9292653e718696d819adb1d42365": 1, "8df65c6b78db70094dfc907ceffea199cba20d4ed0e7293b83eeb50ce14133e9": 1, "08abef548f46bd2f446df8e3eda58af0d92f3e5db6a49db0c22c893287812e1b": 1, "d0fe3b1c63b02af8212fb842ede3fff41799dd897d2c24486d24c68cb8c8f1c3": 1, "1d56d112ea1addfd5a686c5fb351af4828a3f28250937dfb2d8381dda01bfedc": 1, "1d282e3bc6cd6bb0788ff852cbda831ab92a6069bfd8f288b0320cd718bba8eb": 1, "b94fe609c3d1c963b541fc5e537f74ac042aa57abfbef21a11fd1aa52e8a4d49": 1, "e112349d4edc1f0fab1c8c1c5f9618f7f7743f99d092307d8d098aec5ded7e0e": 1, "6576d29e76b900769c90e267e5af43857319be249b8014fd1df43d9afb194415": 1, "d974b87c68d0062e2808670d718cb4775c4e46922a2ed9d755aa116af6c5b8f8": 1, "29037f4e3e481330a76bf05d6d7bad24aa37c18add952ce1e6003032568c6593": 1, "3a9e3a3dfb851c8217ecffaf4f2cdbdb2e4e8f560f03c770581a928e5b664659": 1, "97b3a51fa935de4557199eb1d28411abda32223bb1d9ae5a70fa4c548b7856bc": 1, "9e9914bd3ec42b71fab92b825fca72d5a0ba9d8961ed4aeb9e38e4d35bf9bf15": 1, "941d369920bd4ba3cf132153132d2004429efd5dcfe1783ef1b37f59713bbaee": 1, "f32a504ce6505d581dd3e5c3a95a7f95497b27f2817e53c34e029c8c71540acb": 1, "f72c127d1c10d679f7dbb17da3bdd4aa671aa011984af1ea8516a740fd1a036f": 1, "73495a769427dcd911bf429e7b6b5379ef1043b27e0d150cc750076b86e98d7d": 1, "84cadfbe8c8e14f3ac837d25f4ec295bcd1403c4fa24690a338212fd2eed5104": 1, "69b1c13b928bea95ae49edc9215c507da42a1e0eb761f39eff893bf42f93ea38": 1, "545ac931a80159a5de5888a4a2fe71517b878902d4d15ec1316485fa8ca5396e": 1, "28beb867c00d67ae671d8b7331a3bbc6977fe90e6969d24c61d34ef38084b7cd": 1, "6e38e21ac4666ad0aa0c306d6ac13a492c671aed057b2c0b5b8f5e7146c9bc7b": 1, "62e81123a5ad034b35d500f1c7612aa02846d6b0cfefe6065166a69f784dfb34": 1, "f512d9767c40ec33a767b5be874df3975c425ca1ec4f330d6a75d317411108d7": 1, "5e347b5371563665b9b1a4d8c36dbaa3116a0af6a2b3eea17f13f242aa772a0e": 1, "879bce6e1a723a9073cb95ea29c4415ceef526bbd91889219e158690c8c87221": 1, "3d87a12f148a5d34d34c86c9e90c0855e64846cd8a30435cf683d8b0c925305a": 1, "a1e871bb54d171775ccb5303a0c32c207ceeaaef79b02ba414a65164b6625293": 1, "32f892bab5fd7b93e8c1c66fb345798f57e2e159a5e3909ad0e6f6a7eba3a927": 1, "e52b313e664e9b403257d43958095e1a17827222e88c8c07080b338a0096face": 1, "608f552c8f69b28e3363bfe9cae94baba938b8825922bbe9719eea9f2af247ed": 1, "26fabd8f281624070d5b08ee338499cf55da73d074a54b7052c22abf6c0369b1": 1, "795df5d5e4dbc8c8385c7434dba3165c6102d966a8a46f65952ae727346a49b4": 1, "a23c525e3bc52ab832b841c19c22bb3368e1fed3ea07b28f16d9455e8efeee81": 1, "327d0df32314ff06d280ab2d06a7b5adff195827172284db95e7f1c5cb8bea26": 1, "8a0997d13e1e4a4a7ab0ef7abc15a612d97659a605eca86eb1676b4bb83d0d4a": 1, "70a666bc766cc04c442168d0b24643ea3c1fc4cb1f068d6beb5c9f71da9ebd1a": 1, "9a50386e8477b76cca8ab0fab3675d8e8467d2eb4fcd9001d1370ccbe6aa3d73": 1, "0f7d5863b6164073865a0009fc0204bf26c213d4fd7f0e4eca79b669031437d1": 1, "dcc4ff1d88dc7279c6b3a23b2b234a2dd8841656afcb05a06e162558572affcd": 1, "8730541b764a8d3279e5b8612486dec3ed89630e18961ad7bdb4a1c7c2ac900d": 1, "5d2716d5a37601ad7cf9f803666626a24c89480e8b70fa2146a54d5a25fbdc9f": 1, "a906be1438422dab2b5df74a4a34572d6129d7a4ab9201922e58711d6f86c20e": 1, "7de09f8635a9e85d977c3007332f2a4f426fdfff0bc45b5aff797135479728c4": 1, "8fe089b9db50a8f4529a19acbf5b9d05e962319f8bfc279f12b74abaf5261a93": 1, "4371e644b7eb6ce12f5dda6156655350164140a5f5281d0ca96e1a522aa8290c": 1, "0040db4dea59db10728255b1af32534b0821fbd0ea9e01bee68e5477cf3c6cca": 1, "9340f28e37b03a477f57082d506cb6f7b3cef50f952f5353acc680947d73de74": 1, "1adbe93d4c2669c4e1476f9f3881bbe8aca686e322765cadf64a2e4c0855680a": 1, "e63b259495684c3c9e7bd2e21dbd2aabc44c8b4ac274b430f04ddd36988bee4d": 1, "14fbb6f13ae8ba52b3b952db32b01be2822afc22419b84f0efe50acce2d798b0": 1, "49a849bafe5910f8f69de35761c62d10b06598286e879ad5420e1c0b836b05fe": 1, "0e281b372ec6c6e8d6dbfb6719569d4cfeac5796e64661ab04ff01caf45f1175": 1, "e8fb1a7b117e21647063eb7eb8e97a4f9a15aea33b7f9c1fc6be8531719e27ae": 1, "3541582bf4ece6e7e379a55d93703fca00c92c99c566685ff70945454d52f998": 1, "a5a449ef10aa9f1d26ad216b50b17adbc2416edb64011ee7fc54ef120fc97e3b": 1, "bf5ab9cfaeb453667855cf3841f226ab39a6ba74d01f4f580f2aa66964ce9078": 1, "ddf3a83b740fab1565ed49b34edca68751ba255b8e014ff9e8d1953c91f49bbe": 1, "5e5902510ebac8db3aaafae8855cee83d0e211015cbfe05184e405db373b5682": 1, "def491e36801536d330a492080cfbdef233f4650193d121094e4f7db8856a8b2": 1, "1cb780424a314cda651891e54e29ac9c5a38e1fda8c9f719bdab1a3af1b5cafb": 1, "0ce6feefcc460da0b49d9cc2a5193c77f3e2bc6dc78eac747308237ee692eeb4": 1, "f71c780642d12a29ec94681fe49bc76c89c1a0063acc1660d3c9d4776aa30d02": 1, "9307c47cdd61b0c6e74be8ffd23fbef524e13ed07a13f9c413bdaa886cf3e0d7": 1, "22a11745870cd018c3804f74b6be436bc91b68a2eb5c3ff04d9eaa7922c0b5a6": 1, "fc99b5644302f04bba9e0ead80ca7aa88b334422f68f24a549da58fb7a2bfa2a": 1, "73ae643a682eebc731bbdd5747be83fc5c1b49b8213298463e5005b0dfaeb35a": 1, "658e2200e4488388ea16d23ca077fcbf5370411b16b8ce4e84fe2f13e15dfb4e": 1, "90d5f7f93be5668fd9d7448779742f33661216313f9f20c42669b859e8653a7b": 1, "78674ecd9f763b8b21ade02ebebe7021aa527257534d5f8f31f31cc326185deb": 1, "679728a41b74540d990da5da293970cfed4e51b0d5348256d9ee526c9da5c9d9": 1, "adc3c5cf5958295d95517ae7ae8586d1afed2e704638601a07e3529e7cb70b00": 1, "0c0225a3bbc67369b7f74c3dbb50f7bc369b2a60b4c7b11b062b84d254767fee": 1, "8bc84985a7ccc2940669d84d72a0aeae7a30e30827e8cc0574225df5120d5d68": 1, "234c53b5c1123c50fc8a40bc384c20b2318f9524305932fc9622773e75b86d03": 1, "088585c5f5ef44d1783a23e703a02a173fec3ad5c3a4a0ecd1e73bb92a6d2dde": 1, "57e8440a4095dbde2b83014411b5ca40d5ec4937670b3b844bb6d75b38735ebc": 1, "de8ef7def3c22b8204965586d38ec78b3ebe4807131f3440d8dfdf14442298d1": 1, "b5dedf1163d38249c210731ec892fdb79faf7e0bb46867872cc4c78f4362fce5": 1, "491c99b740901ec4ac11d45b6d5ef06b2fcfb71ad67faca23e9d941cd80235c5": 1, "0b13ee511fb004afeead07db9bc7851a3f2fc896835f74810259ed509767dc1d": 1, "6775142f8350b96adf1d0c113e9d3e7b25b56d47ce19f3abf2ce4dfc7c8648de": 1, "1d34c8af894f793f33b58ab60c4ca75d1e1d0cbd45bc7e474e271e25dae8fe84": 1, "0af354065b4041dd1a6b627d1b4b37b5c0d36509af20fa91d688f4d70238dd8f": 1, "87e39b1cfd97b6bddccb6ec2f78bf28413cebb565012c6c1efb171d61a0bbbd8": 1, "f93ddf87e89eb562d630f9cf4b08904a92700ff6513c2020967ae30d12d5b9ee": 1, "c85dd13b3f20a923d0bbc3408a01ad31bff196206c9549d2ccc053072d2e5614": 1, "606cdfdac47d3af488c1827441a6be06f7033dcca5cb76dd3219149e7f29744b": 1, "743a724f01bd736e536edd8a9188b864af4a6cb5c109419fd2362e9fa42c7a61": 1, "e9f6b061b8aadb1de06ffeac376ccc95c283633961838c7a0e35d87610f19bb1": 1, "6173f5cb8f7c76acd930c11df4055682f6e6fc54ecfdf8fec40f0a7db4c4603d": 1, "370f8786c076cdd37727f1309bca74bc43901bf4242acf715146f41679e4611c": 1, "95e1431a51045db6a1be0ee741cbf8554324dc63f36f8922e7303c4766fafdb9": 1, "c8fe8ee61a1bf960ab1d4841d7b379fcd2f203e3d4278512fea36b5181fed607": 1, "7d3694627f86d7e0ef22d73335f4b604f891b622569b1369796d50cdc598fbe0": 1, "0216a9cfd15161439fbb02b4d9b400080ca66b010479f6f21233f775df89c256": 1, "e6a7fd3ee646b79b1b88e2618a6375a01e5d773ddbb6cf80f09ed3e3c84c16d2": 1, "d54bcfbfe7959f15dafbb1365bcf94525e315fc2eca175d27ed6afe09a872dc9": 1, "d16183bd6e8e3ba7983729edfb537025b63d9affeb5c651e41c558acdb2bc167": 1, "d1cf9f0574301b4aada1f2acbfbe587e695acb02a837fe8828469cf0bb6a2d38": 1, "1b957e6e4c82e151ec0ecc57ade24f05c7e71efec5a9121aabd5e10641f2c580": 1, "6ec06061738e1260bce1966713fea0c7ff93ef394586644d5262417561e31a0b": 1, "3040be250b4e1e029828b526b530d706edb78dcfc9fb950126f075ff71cf5feb": 1, "e101806225bfbc1dbdefb9e808be77b65f6644c97e854e905498455166621a78": 1, "974e867e4c02355a571cba58949b0d387624f0293151570fbed6bae7f75217ef": 1, "3f0a5c1223f8710e6aeecac7d08dbb910986c8b7958e694e516448a780ebb6b1": 1, "37dc57d0a11df26515c01a20ae79d5029485b20344abfccb8fea57fa3c4940d4": 1, "739d5a312a4432f0a45c9324844c7a0e97b9795ef3a1dc2493731cb6bc64ec93": 1, "cbc238cdcb25b7e042c1ddc536e12df3658f0d28f6740d97a83bf121fb759380": 1, "2d07fd0a28eee2987bcf1ffb4e36dd1a031426fd6a26f5cac17ecfcbd8bfe3cb": 1, "c9adb1963d42cb755a3e258c8453f777baabd7d0c6dedcf295a59ec5406cf712": 1, "d145c64d9ac740c31b269aa430935685b30fbd8bd950676521a90db3c67b8966": 1, "0d0ff3bf3a5235f60ccfe558cfcc28dcccfd7f34aeab667df8ffedcdb6657cfd": 1, "e6787405fd3482d02ee9dea1229953db21e931d19ef53a79318562be42c04dc9": 1, "444d4460d30fdb2e9ac8a3d5fd0a753968b08297bb2a334c7b3d3811e089bc36": 1, "f66e85d827cf402fba8a3bf9e25fd384d416eea24c6a0d43d1299d6a7cf2e050": 1, "fec9c3552b7a34eaa2097aada275ddb820f3713bb3c0a6cc32a3e91539acac74": 1, "9f10a5014c91af822448dc505cce85d2b39c59d3a5ea22d7cec434deffce2ade": 1, "29d9d45b4d777a2f8a0cf1b9ed1097241e494367b31b761abc246b487cb499ca": 1, "dd3edee7f3f9ad288f17adac56c4f8b6e1e90e7a85d6e06751cc530542aaf2d7": 1, "26cdfbc978f09823007fd96a6b3985d41a8fe977814b8d7af9ddb59f10432074": 1, "be56532d3dab51875cf522852c234743ec6a15eaa0c389527080b23ee50f6414": 1, "abb76f5ca44378d24b03b1d80eb5668006fe0f824640f418a7147d666ca554e8": 1, "9c989ca802688b8cd419fed2e31f585484dbd9fa1d40c5e612811d9790a156dc": 1, "a79aa1961db98fde40a7d680edb0a4a51630cbd68054cc571d2c95d6ed4492a6": 1, "22c9e28eebb43b857d90774f14c61cb0ecec0295c08f37ecf6e6bc5f926a6cdf": 1, "f2f2c5411dc43aee3edd0b68a8d31a60ad3cc4fba0ee8f522f391f11acc6e987": 1, "4803f05e0e3758c23b27fc7c97c56f8bacb94d4be09f0053af5f5f6e37dde2a8": 1, "5650e9ad16d12b7170393b2cb4b39b171343d3c3f0a46e8e9cf40b540430b800": 1, "985d717a6785374298532b0f2206941d8c6b66eea27728a16663f13ff840f197": 1, "b49bab3ac24c439fb83319f26fb3b2d0c16f7f46f2874b224b4b7e09cd02d4f8": 1, "9a864b93c2586008c20f6b9a75d17016df6bf99f053fa93578ea2c59aed71c52": 1, "85400f31b8387ae3d4ceda160e6db4636b0abad1c15761ab40f5fb0129d0cb5c": 1, "0e1ae512b2560b4f49f787a6eb87060be31e08290457354d2fb048bbdfdeed4c": 1, "3d6a23c842e99729119628fbe7cef7a2368e2b4b92413e5979038fa152b9c251": 1, "b6e66af7b40a5b5b0bd4e381e20f050292425c874e0387e1b30230fc08f2591c": 1, "102538bbd21e0c84b385064cb1e5c8f469cd7bb7578c2aabff4533318eefe0a9": 1, "da6ff8331c61d6bb14bf1fa6e38917ed104e102b0e78f761e92b0cc8cb2e0cac": 1, "94c624c889b17c53b7dd0dadb03efbb04becfcb9761898573aae1f9dbc27ca84": 1, "58c8c6798f9454718bfc17ffb5206fae6dd8abdcda3e836dfd6f369de785bb81": 1, "107b8787c78992f750510aeae1eb54467156801e1373384098a5239e064c4225": 1, "109a64762d7579cf33a6a113516f0245ddaf6142b4ad42b07f6032edd13a8a75": 1, "420cdb859e266ac24065d7c86f3e211ac441c09db674f32d6f80939d8a8de56e": 1, "f99ba6ef68941e59849a3e1f5532f54db9d71a0a8146fb823c92bfa8306df2d7": 1, "74d3865abdf2b9c65cbf14ee9d10337b9ce3e2a2e27933373713b113d7ca504f": 1, "10969a7f964ab5ce53f491f0a348b931f9a7f176d94143a47cdedd7b23328cf9": 1, "a48e42153db5513dd46f1f3d97be191d5ec37896c03b09ac8ea7892595eb56d8": 1, "6fa162b7a8b4a362cce2f219b0b5d6793f454c791afafb9d18144dd1a2fd8c64": 1, "d7fa077e073d91f702d1da6e8f286574e89a0cee0c35df2c69deac2a1092e3d1": 1, "107dec956c56a3eb9813a0b5a4b7d6e71bc73d30e4f7d7430c6ef1d7be4898f9": 1, "be0018ce2ef55c3d1793b04cbcbc0d952298f5e8a7caf6e7d46bf09a51f1c27f": 1, "516907de9ad6beee9deb79525ef3a1cce205b0cb3451088612ef295403f67c3e": 1, "556b07e170a54405a905296f70e2be13b0cc07ee75c1ea738629adba0c6d74c9": 1, "f8a3c476aaf40dee2ee3ac772bf8298c037c417b2278e1ed0a22c45e47b8df15": 1, "16eb614d8f8b4b7145f0d23237c5a50620bb3e8f77180e6f44dd589162270934": 1, "cadff1abe7c0bb428685a80eb3f829dd4e1fe86ed4c64f6115d673cafba169ad": 1, "c6589521b61822431efa7d17434b6fbd7691a79db5887292914fb10cb05ae283": 1, "ea19e2fa4440dc337dfad3a7bd74cd33f3ae6f2850635e10fea3a7479d95567b": 1, "57abdac4c9f797f589b0df204379bc7246331e8a14ec94bfaa52e95e9a68190b": 1, "c8268c36ff978c1fc1feda73755111f00a31d6c44862f36952d52debd2201f9f": 1, "b1c08b2d3bfa7f14c3b992aa9482617a8ed5af92fadb667547330c73cc680a5c": 1, "f08ac037cea6bbaa524f5b5fac18afefea0e7fccf81af4e60ae43996c60824e9": 1, "b42c408e994e50a8c5afed5225b56e04534561b38921361aac198fe67f76d740": 1, "b412f0209077a16ef8ae71231a0dbed0404e1b78af58e2fa1919dbf6f25a4026": 1, "8c54443b27cf4962ebbdd604664f51da1c1cb341dc06475ea1d0287deb6d6026": 1, "cf935f028fb90cdef5f89361e4b4516cf25fd3c5d5053a7c7590bbab95ae9927": 1, "1ef50f1a57f651f1bbea10313db026c0484c40b2a01d3fdfca52785191956205": 1, "58f5d71e3ed076f74b70412040e5c20dc18975946837bd178eef5fd6b59efafd": 1, "3f120a7a24d746acbe12aaa6c0aab44f5368e2381f016bf765eff785c2eb429b": 1, "398a7d771cc637eb69b1e75fc4b9761fecf6f531cf68e5fb7f8e23bb35c07a3c": 1, "022ad4f937171bed9576b641ae2c455bb9246077645f1822d57fbc19ac890d6f": 1, "e0cbb5a09ab6eb8244100758dfbdeafaa6a02421dc8348663da349cff68ded0b": 1, "1a05751bbb1c8e3142017fefbae1e2548678b5e5e88b9a8b00b0862817dc13d6": 1, "28fab8eb91be9bdce30b7bdb5fb95469aca45175713420bd1908b28a15a5dc19": 1, "ac33a17d4847acbdab728a2f8202d95e0e752d97cc499c3941fb81673c525791": 1, "16d2aded88aca949c3b50236ffe6937fc1330fc49c0bbe1ef952ba7cf13d8bdc": 1, "11e035808691f8ff7c807c608df527b747a963c12d38ae866506194c70ab9b9a": 1, "aa37f05536c95ac9e3199f758ef58e732995d665c55b099883f3145ae81168bb": 1, "17b8ee04a5cf76cb1a6ca7bdadb10cebb94fd6458a1854104cc77751fd46c60c": 1, "9282a09c7136b2c325cd7dba744210d7876f0743b626a3d7599ad4c265fe59c7": 1, "ed7b3bba4d33548878a45c65f177fab059c7137e47e7e585ac0713184fa97ee4": 1, "0a8d3fcaac7149b19669d9edd422a7835ff6bb08dbb8cf7a93597c4b5d8e2312": 1, "5c9b2fae3b47b5c58f338a95d828bceb548c255bf3aa2dc94660db56e4187aac": 1, "127e22e9d851652951296eeddd8644b190bf84c44f6692699b3ca2c775f0c46f": 1, "236e0260cfce8978130fe73f50abb00609b72c55b7969777e877b0e3431ca473": 1, "f3ca2303e1b15c16a13f0044e8f4667c66a5302235c7273a13966ffd0307a6e0": 1, "3924377863e3d8b8d28d000cd32c9a84481e1913f225f6eedca380ec46344c9a": 1, "5d50106f58e9b437d05aa3987ec4aad07c05aeb5b51080a2e61498c7577d5e58": 1, "fe7430a6aa15de1b5ec2c5ead3d18d009eaa04fba9e092099873437da985ec46": 1, "97ffd21d06e08048ed622861d5ad543663234538ba2593673fd5b6c244a496fe": 1, "c1a036040ec56423f5da9d1cad6289044ae058dbcfba9538196d77a865e00dfa": 1, "e9c1e727c94fd869cbbea87f00d454fc82b2af039ab387f2488131b7f2c9e543": 1, "f50dc59bf57e63615d82ca4df2d0ae053a547d25591525c7842f6d6c1d121fe1": 1, "8a1d947ee9cdf28c504d0469d16e1515285628c93fdc143c2568e15e7a46daeb": 1, "19b37dc6e89ac6e17706c24a6c7288f9d72af392d5916bf7c06a9628edac74b5": 1, "a08f7607f3402d78ec140e5baf1520f2468df950c2eb2f4102552bb7d750f43a": 1, "7e0ecb1c1266e4ea337cc09a389236f597e95e18b8e95aec50a817897b6c88ce": 1, "432860a699c67fb69807a9584f421eb3bc16ac6cb4668081468d78d2c1abefd4": 1, "d88e672599d5fb9ac6e64d14ec4e7619499f5a2bf1ec7fa16ae6f63fc724b22e": 1, "a28513e47edc6d1bcd06daf08badb9286cfc0b73fb07bb069aac66db0b43dc0c": 1, "65fbce45d14de5033ec4a0fde91cf1ccbeabec98ae424322220abfb42a9c9a3b": 1, "001b3c9b63eae803d0a90de066e9d062102af5de1611a5a8a70585b1990a6df1": 1, "6c08779907a697df2c5cf9bf55c0d9f70c8a2c9eb056fcd25d6c217453b39d53": 1, "51e41f1133dd1335cb07d7bee0ec8711270125adcc24b31831b771cd13e6ad06": 1, "f24468f1b7d09feb7914202ea83ec50cb2e6580dd841d6e672c59d0eb8f0ca24": 1, "8865978293e9d15e6b7445b0541e5878cebad8f1ef57d2ce05c3238c366dd88f": 1, "d7f69efb942335c726e352c5d1c255b9c1a0a6f8d47bed0f3aca90b092134d6f": 1, "87c101c70edb56e34e08b3181df096fcd5909960e6e2e390e716bf9338359a11": 1, "c81512c79f1ec437f9df266a8881a9783238f5d7085d0743f7a97a158e0d12ca": 1, "511faca2bd0f60a2adcb8f02e4bfee8e6125a2664cd3a6462d27bafd54fd7bb7": 1, "8cc68861517e740e3301257b8e1b6b82137573ec9303aa44f39d0f665000ec0a": 5, "36886b1a7a9959cce73712006e8463c3786fcf304c3289ef1d04877cf6fb7c39": 5, "2995d6af59c450371b005fc51ddf9d2be96a6a0137ea1c2483bc1a396bdb4bf8": 5, "38fa869a6c9b55e46d11a1a3e1d6b8c9dfd0e14f8652434cf8e4631f8c995d95": 5, "7b50e309a883ad2bbac7b2b7e382f490b772fa153642fd8e94ecd663db692ca1": 5, "3d8e61ecb5bca9c310079298169852efcd7fee239719ad369a5591e2ac86e447": 5, "b277373123ab87a6c06ef0eaa00a2d504c74df94e2a6a3f1b337c840f75d629d": 5, "b2d09f59059e847f0f9aff93e865f92b153a3825f526a07e429bfdf71a37c693": 5, "5e43fe3e8ddf21afe64c45b78b1ec7829aae81ce55b30e3393b61aed81d83c5b": 5, "767f22ae4b7c7761ba1b99f8941faf3c6687b09744f02c872062b7d5a553f94d": 5, "7ede3fc7925a4be385a64b7754a36c82c44a973ff1eb50532af905c66b97efcf": 5, "c62c7ba58c0fa0eeb47b69ecaa2c2aa5c074541c27782165b95cb4e41630b9dc": 5, "4fd813a3bff2cd616e97905d9b14f29eb524e89a333b2c9ce84a58d2b7c72c83": 5, "2b1bdcdba8b2e5714699077beca82f25898a49f82bffa629b3b18c9af35931aa": 5, "c29e7f605d7047f3b198af02a317b9e44f50c8766f4b4021bbce6f3a44d88419": 5, "91c4a0ff48c9d607ab44faf98b21cf4e442a393de67982a764f735dd48f2e608": 5, "9f6a523c917b1258cb6ebeb98fefe4b6e85b64326c64b50a4699815e6d01026c": 5, "7ff1832817126c2933e98bbae0b228bb38462475f2083b89f2f3255c044ed2f2": 5, "580bf3e3f2f62f73f2b07b5baba1b84fb7816b2af04fd5cccc0f9a5c873a4eb0": 5, "b552191964dacc63e6f0c62c7684aede481ee80698e38fa37c82ada39b027dbd": 5, "62bbfed4cc9b7b065c98c3c8ec83412e4205ed7d2037256a11ac2e8497b8fae5": 5, "2a695b0704774197bda408eba500bc8d4909433d1b4df391497a7c4de1e8229b": 5, "21a5eecd7d22f292735d6f4eb79bc0d60fa8ffc1737b7ca55eb5e4a324c639ca": 5, "b7c213110335998156f9ca5f40c71dc005de3bd3ea916543df666b54445a17f3": 5, "f145997fc9c83f6664bec8e51f34e672bf9da98f74099179ea7d557c16a7e698": 5, "9ed81d66123cb63ac9cdf8f628704214ced83721e5c473a1cb2cea5514b3657d": 5, "c2829edfade2e0ab156354508e739569c2076df9ce243f3583a02d9492a2f69c": 5, "bcdce806b7bc823373ff144cbd10af96e294fd2058781370365ad635a9fa5171": 5, "fa20bd2882595093991d8d9a7866a6282855bef0543785965a246d2a95dcb6e9": 5, "010495b50729a202a7133c29d1e32328eb587ddb82cd405a4956e1552640d768": 5, "1d23b5d6802c94804fde370f65e1f6dfbeafb5dcd31a07517579e45c3e8a4cac": 5, "1e708f1f50ae6f41cd6a46f18ebe4dd7b27d4fce56889cbf1b1655ddd323c83d": 5, "d42ab92478c311bb079883062777a7be50112fa236f8f72646bf40b693c565a5": 5, "a7d6a83aacfdddbeb3164012cb0053e77e637bad7d1e73df038cda592ac7cdec": 5, "dab93703af8d32a58522ac26ae8b6663998fd41aa66e72200eb7fbabaf2928a9": 5, "edcdb826b0c477e568ae6dbced794ff2806e9374c88c41608c9ee08628c8872a": 5, "c7e2824266a52ed933e26bea17e0e53df48bc4ffc3dfc3e0d7b517744aab1777": 5, "cd6a73361272cf89d487697cbb635e1d863202ab48a0833030746ed065e8c3bc": 5, "8348b726a3db0ebff80b508ba1a31e2c4401ada125583ade0241008bc76fcfcb": 5, "8f856c615419138e29ebbb7577dfab9e3edffa58a719349a738454140716d551": 5, "89d8caf1f124bc39882be8fb0cb24f11ac9cd1289d8b6b32af3f70427ece8726": 5, "35d0086d64184446a476353cb905e776fb9f71523686e393ca8e35d40c48f42b": 5, "741813aaad91c45e3438c32c6109a5dcf268bf5b09aa5797b38bc33dad58caab": 5, "8de2d486dfe12a327b74cc186249fed09161072bf5b50930d2954d646d09d6b4": 5, "86dfdd8e7d5ba3133c8b0128fbbc68cc3ecd3982dfbf2485c663fa516edc2540": 5, "477d2f06f98affd788170937045e81875cefd979f23497b6c3c6b83e0df237f4": 5, "c40ef739d0f108cd4c8db0b2ed838992228759e17e7af6ee153244c8189f040a": 5, "b43d294ea48826511f6cd9160ed10652ab5c33ba66576ed6f093b92c73d0df3e": 5, "f5e7c305d1b26a750b66a23bd5d3571fa0a613dd4106f83fc5899a5a2f3e8641": 5, "fc24b5f2b361def5a7e825cf448aba4296c09601a85da212bd6e91b961775db0": 5, "c68282e2b5d069ef5339e7c1192b60b95f3621d223760f323de4e70d8d273873": 5, "41d2021c5bc89e87718225f5637f12477da0ab8506c7ac0d8bf6584dcef8cfa6": 5, "0e5f757f8d706399210566733bc9ccf123838230eecb4de3176ecf297a5b4311": 5, "989b703605bf1b9bf8380a6af04c310ed4c9e3dba3b91db25ee7003c91d150ab": 5, "fea877a6e00c6fc56a4b065bd6ed399465c90b1abbd7d89da0ca52ddbacbb4e7": 5, "8bf12570234dad8c2c79d4cef8940cc139b9687f45211433acdffb80d1e134be": 5, "e857865527058764dd6b2d456447714bd0652b74b13c7e56ed524be1cb9208b2": 5, "f16d8f1f9ad11d9f25d57095289bf7c8469f4a2dcbb45bdef255840e92cb2a5b": 5, "81566383ab14ae3f9ba236314abc1aa9c3ede2b0b4c66d9276d001427d2f5a76": 5, "c0a2808edb41051f00dcfc90fe7538a180e62410d454c3fce9928a4e2965f18d": 5, "f115209b3485f87cb9e35605f963625eaf6853066247fa69190e5c84bbe3779b": 5, "4341e5da3cbd625e54c176d86f09b7247db4bf48f0df439e490e0d09a4030db1": 5, "1bc392ae731081a5da635726f60e3424452f472c2e21c1b05d2f0545aae8a647": 5, "23ec8e39428967a85aa7a52cdf24a03a028a65f2282677b9ad4151968aa6cadf": 5, "eafce2768791917fdea31419b21e62eecb2cbbd48018200d9f527fdbb1ac4f1d": 5, "2681fb7cd180709583364a83af3cf3f448d9724d4f4a2257b28ae57375ff3347": 5, "f0b554fdf78fb3365953842bf89ad777b00699c555c0d9231b1f06d322198941": 5, "18230fd711a5754419989990f7500bc2da9fa92c4a0866685bafc6a6338d41ea": 5, "880df17b771156f334ea837e0a72276aaa9c9485c00e337b1a17bd2b167094b9": 5, "4d79da89170433138e020f77a125470d361fec5307099f69d9920c5a184d7524": 5, "6ca1cdd2503230bff95b0beb017310cb10137224f3e2553838a06a9bd9938e0f": 5, "fb1a1d0510dc788860deb11231d5e5735c974134b3173ec70f844ef7990d668e": 5, "cbaf20a9e5d052963d6deca5d493242004049d0e5f681281a82d306508a5379c": 5, "12f56f9c9b49d612171387867a70741e6dfc1f95e01c14fa3038e5451c71c86a": 5, "3d0c7a1c91008130619ae289031828ae730fadd172abe386b38914b0a76d1bfe": 5, "9a14bb7620b7166448c4fbf460efadfaac1c172b3d33a260bbd3adbe9a05bc93": 5, "603cf9a132cb22738518453fc1c22a7b1a62155bdfcfaa2949653c4cdacadb00": 5, "7f3c089a36d713076e8de790c08a73a94fcb30031290f09dc5641173f2047fa2": 5, "a33dcd672fc00973f4f1670470cc8e4d76d35f2d6b9ccaad4163fc927dcefdff": 5, "1e050fded325df972b33ce034b9e6f3e7a2288aa02974353efc651f7f3961d3e": 5, "0ced98b134f53eac21afa836a86c8b415a4e25adbde8fd9fd5a702ab362a4de5": 5, "fce62d8f7264fb6497bd40a55def21316e6bc193bedf2134a6aedafff2f0b85e": 5, "1d96b9cb69f9f7a06b84f2880520133e757dcda6a839591523432961080017d3": 5, "2afc22f9e2e95eb168a7ef35303572e7eb67569e54bc2f984604ac9ab026c206": 5, "d7841745ff1ba71fa55005acb38672837a0b4b8dbde47ab855c2f4b45fd37396": 5, "f7f92e21451ec54c0071ada8612c339e658638129b7ccb8196c9912303c91ca2": 5, "f99fd82e8f00fe25895d2a2fbcfa13eb2c4f14651276b481aa5aee3a0cd7eb70": 5, "2f9ad0243469591e31df069170bdf51e4ed8154b31676cd24505a62e0c876f1b": 5, "13701a04ed014c2b6897c85716af2000f4254f6630d2e3ba5dc6f6292e29c6d2": 5, "d75854a5a3c842e77c454a4d59ed2b536b55905de2d866e493fc08b23f61c0f9": 5, "ffed5066be039143297ecccf481d54cffe0dcb63b52fe5c8de69374fd9dcd577": 5, "dc9604595e1eab6327fc093078ba00826999482f279e645e5f31a2fbac809006": 5, "f5976cd7405bb2ec7043724ec8e879d7a536e5325c1331e41ee5093a15b16dbd": 5, "31c0b418992a4ef79bf10f8a2e966aed1fc9409dde9809c03d2960df08257bfe": 5, "877e968a1f60bf768a8d78ff7dc13c3dc276f0cfb9939723a746790028c2e837": 5, "082d0647368b738f130da114377c4ea0079e006fedc7801278cd17a55007e573": 5, "6a2eea65f8bb7f4fbb437944997f807a263b3f747a72dfd85855a8a592e39d82": 5, "1e6eb6466c1e1a100f5401199d534274533f7029a4e0fa2cfd595e02a7c905ff": 5, "fc8effd1dd6e394ff6a1780c08928499cd2ddbc40d5e8e2710d9ffba8f7be69d": 5, "dd64f31f0757815520a08f49c4ebd857df599f95f16e61fdef305174a9ce925e": 5, "b9b23e774bd78d8f5f0b2383eec3950fc42ad11e79f7d0a32efe6114da6d819a": 10, "0b1e732f9dbd4252e0efe6bf1257b2188a5167075de7986384291943a3b9f18c": 10, "af194c377f8cee97bc3e6b206c9826ac5364c002e510648f98feedd8fa43b558": 10, "6a24cb556c3ab320023a02bf924691b9086baee035d6464626069a5d23dfeeaa": 10, "36d5c617afff3967ba6ef139a902f7aa4f639815154e3c9db93b981a9cc7ec97": 10, "30f464ad669f3e711671a4d29823410f9806b222ead5b0e377481368a1c3defe": 10, "98289f8cdbe006eabfd27c48f818afba72c576eabb8095e1fe90249e00c81e07": 10, "26c39be08b18d41643f2579f7e94f83bef5a394582edeff5cf7a7a38555ca141": 10, "5e74a356cadc90b103240a36a1f8628d9735b52f85e6f48c0bc132a0fdb88557": 10, "57c8ecb12cd498719ca911eab23b7e0b25a1d478155ce70a6201ef5cb81453dd": 10, "22d2f3d96b9b74438578d8d1c1f80950dc922d9dee9b5ad96fa55764de6c4d06": 10, "f108367b7851c02ebbada189ea3f97b2109353444d0f94a4d85990d1347d15ac": 10, "823a38b58b7fe0d3866d8b6ba1e9405f967ceb23d5b30ebb00abde2a6fb2a86e": 10, "7fd65aded4189a97a71ab7118577268c9f45d5c83adc9507210cf851de5dc08c": 10, "88e53c6ea3100a5d1068e8d25aa36faa74f4a3cb5331c0ec11d17153cd687b54": 10, "5d75f4c85c5192ed96a4509809f706a95c1bc9d75d7d742608ed6f28a0d2dfe5": 10, "71dd78f162c741b93550d6f67b9d97f121608fcbbb4ad1ec9f6edf43b77f8c5c": 10, "05352797f2f88d4362b218896ab9b63b74ceb51cef4c2e772232903a1a30c563": 10, "98439d33dcb5d13200fcba117ae47fd2956118bb9059e51b3c84d7510706293a": 10, "5caa428ba4a876e840f107f5687049dc4103c231dba1830df11f4780497a9036": 10, "9dc9da260d56a940c8291e6e3997627439489f1d511c7f090d1c328bbbd592b6": 10, "a686c1e695a5722289e3bfad372ad6192cf4e192db66847cec4fd7d72094d90a": 10, "8958892b276dd6aa20898087649bf625a1417edbf9aff9ba10afd6630c5c4599": 10, "01041fdfcfdb7499bc762b4f0e0b052a20e8246f673f7b2ea456156f5c76830e": 10, "4cc0f38a6cd2d3e8525c539859f50aeead589dc473b0f3617f8c84e4c5c3f57c": 10, "21c4d96264833a7ba788063f45cb135ebc7f56917e198136a111c30297c2583b": 10, "e7f889b3f8fcacc3a4484876b5a2f1def5b68eeecdeff955630756a7ea171470": 10, "589772c86f736d653f670a3494e7ee15594deaf0ae50c58f83f77b6260030a3c": 10, "73cda9219bb23e17ce03e38bc3538089e2712fa40f65ce538b60f61bf05542ce": 10, "68c7a911a307d7033c26c83eb32fa4df60d7e5dc8421afc93c897c623d806f03": 10, "2daada5e2060e014d7dbb67100913f3ab216ab916d1e9e657bb332490fabdf12": 10, "2c697eef4aa3ba2d501734fdae8acf1d8776e0f85658342a81259dac67fa5ffa": 10, "4582de091f28d3cd9e5c458e263d18806a48f9cb5dea7487e8119f09485c9e1c": 10, "fd06a0f520b426c3f352e52819b4fe22e95aaf70ae2dc4784e61ea0efa9f6e70": 10, "3ee089f29158df3a9fed185fd539e9b3d2d9ee17b4493ebdbcd3fe896357f8c8": 10, "9ef41bb4818597385d4ef04ebe5d8cf56cd12a7edaab0cf26790f47cfb43ceec": 10, "cc508dfeb1b032e84681913eb39961976021602953676449264ad7a8104060f1": 10, "534053b8c6cf75806a8e35b9e9d4973ffdd4f68c2c020de9beef408e5d57ad9b": 10, "971fa932010c6f33d65b14586273c858e9f45d74a7fd96c588fc78a40253ec8a": 10, "f6fbb7735d686ee1ab2bd892a0977279a2531b02ca42521b8d5b2b3414e50728": 10, "f0657452ad5af4982cab94d3761428bb154ff73cbe80fac9ce44254d844b4852": 10, "f8872769d091d154a6cfbfc7e8d6e1b602a603cb64089e0fcfe6372ada8408bf": 10, "455965e40fb51432f2784f5ab4fbf9055aa50b6ae164b3958a74a0dfeb008463": 10, "9c461eee0e0b28eb44adb757749e8cf907b23c179804f3a2e2aeb0d01319bddf": 10, "bdf9561f2c539615d435411f9b7cc47e026001d42cad31f09797c2f6ced8d5a2": 10, "15ea5721d3199c187380038903241da84804080db87c936ba83ee70c74ef42ac": 10, "6ba2c54dce6a633580e0b76259670d091d2c0817a1a3df95ecd952d1fa375933": 10, "8a752c77ad1a125d7ca347cf1878e7a1e67906572717d331623abd07b2f110fe": 10, "fe4379c3d0eb2ffa09e0f501c84c0822750f8a38727535f8bc4081c23ace21df": 10, "72fbd3e22d69e9eeb8b995820f7370dd5829b5a76867feefac4cc00fcd52bc0c": 10, "6d7aaeaace49507b1d0e2286c1a67d770d6591caaa8a78e9e64f304715e193f4": 10, "dcb51906ebc624529939c71fa25dd75e51599a1434ade72d30fcf5562ddcfcd8": 10, "f37d06b71e6dafde795336f9b35f40512f83b14d856668985005905fe6de382b": 10, "cb6841ca8fb8987e785c88d5c39800a4d19bcdda997cef300be9f14d80687246": 10, "8dfd34b99cd668290655717df6e697f316ae875e8efd0041e3aa247c6dbe74f5": 10, "2e960d35be5b460009d31957c3464fed01beb0ba9fb675fe103046df378aa883": 10, "d99ed576eafa8871bb136b778363fd57c64c89b4b1a90a215f344f5a8f65e0e5": 10, "b830cb81834898922e2d1fb3a2edfebac701cb89f8e2bb36119853377c30d3d1": 10, "3ace767cfda4836fa1ad967973c794cadade8e6be8d5dc4822f73ac10c76c98c": 10, "8df385614b6f730410cf53460e7ba455c97581c39f5ea9d64d25f30efab1f1fd": 10, "8c23fd6771c04f4530ca0c81948764117ff9f909593add28cb66166665ed2aa0": 10, "1f3db73a379357f3ae5f6e92fa82359122b9b7d53a574512e61e4fbfecf48892": 10, "0efc581b963636245f6f1134ccd116447ad6de1151b564e58e410c4a082c8b61": 10, "23af7e4e303add6bacbc89ee2e4c51b3dd686390f5be7a539bc9785566797d5d": 10, "f84457dbca0212ae31d59072112b880bc7d1f192e5fffdb4cf789408e67fd777": 10, "f4d8af8c1e74c47ae2695c0a4fdac7d94d4d88480fe38618cf241896d5b6f6b0": 10, "dbc1cdbc055580f7986f437dfd939d34e084ef164ccc45ce62ad79d5707f4565": 10, "48ef4892986e9f08bd6c3cf1d4024c8b43b054f5ff807dc9ac32d541f11f9b32": 10, "ddff3351910fba3df834dae61ecfcf8c0be5d1b6f371bc7255ad080650e224d2": 10, "4b8f0a1f4dfc3a85516ed9a749c55168dccb76cd2dc9fc2cbee67c2117ca6078": 10, "0a70036562334a8c68025e643cd78c6031e9300d086ee2cad237cc90baa1ce3f": 10, "9261d4296426b40c10e8e0b3c64fd2813e0b60252aaed73b4afea5069774108e": 10, "93e34e43e172aecf746dcc1e3a80ee210d1f5367521e546fd40a16afe9b3b3ce": 10, "c446e30b82c74ab6a6a7dd9f6de93d296926003692dbbc39d0ac1fd91c720034": 10, "407d36426061c5ca54bd6e8b5a87fbadf3029a86701ae6df7df912e257fb517d": 10, "da233f9a7108b951aa2594ac0b31e999d49b05c663d121afb281bfbeab2779e3": 10, "64ad6a8571217601c6747602cddd53e41995903d1847828c51d33303fcd6cbe3": 10, "5bcd2f93376d8b2b403adfb83c37098f52cb99a6554804a179ea4967de55882f": 10, "667286416171714557253f60b8924fbd11569991dcc6363bcd58a443d8216559": 10, "936bd648e5b816c0f12af9f3b9862b378bd7ac68018f00e474190639fe53cddc": 10, "244a46b735111c582d0adbf2c27dd1e8a24a006a832255d03a34ecbe6d0bd5c2": 10, "fb9035d84ef0d66f83c1a52864f9df39fa50c52c2cedc205e30fdf82ac67d811": 10, "54215783f91d42a36dc5712789e0f8a470ab89ce105a40243e3a8b88572c9f79": 10, "2e64147174fc68692480706607246c563ff8293d757bc7c37ad91329a8b9a00c": 10, "389b1a6f62e5b1d3222f93c5568c9bdd276d2fef9696119f1cc42439ca71d8b5": 10, "5d4fa3cf2026f2e218fad444e26147a0855fce0b7e4c95141af888a0077e2e9d": 10, "0e998b4b0d48927244e33a5f907a4cc231344f577ac5313026a7e0c8a2400380": 10, "8074b3d7f25ebc80843d5baa2c58041f672ef2a2e23a976972b9a338e239861d": 10, "0d55acb3109c7bf45e668e6ec39806804e13ac9b2aa1d6981506cf8c36e1323d": 10, "18797872a583a19e895e6204401228db6f769a1da4b2b62569bfa34efbcc125d": 10, "69bab7ef6556c45383cb45eb0d2c53d9346ec8faf2168debd8587923c8a2630d": 10, "78e3ac37cd91d6a9286a6fbf88c5c2e4ba20994d96a5bbc234da7f54e3ee33f8": 10, "5b13de3498afc10a89654e0a7ab86cd05883b078c9a8ccef0a9e02bdbb337ec3": 10, "ca60b72da8dc72a658e1fe587724ea88137f79b75e837dfba24339baf8356c4a": 10, "89e5cc97ea80edc94632d27eb98be9ee314b0c0cd6c12ad0e221bb48eb9f2095": 10, "3909cbe5126f38b3b25c61db295f3fb70ad4a4c9fcaf2ca587cc3169e9c9fc31": 10, "16493e82d981b479e0bc0cff1f2f487f86bec8c038ce3f98c839b77033b120d6": 10, "ed5fe51b5c9dd1a61539ebd052d4c878690c53dd930ece916f9ad04991c5e877": 10, "924bc3504137194934eabf9bfa70569681135817884c73946b8fc683705c9ab1": 10, "350ec0d1d959d8661e8dea70567dba9093983e4166edc9c68289295ca420532c": 10, "9b45e24ac4bb99c8ae5c4ada8465a5aeacbf7c66d3e041c7ce7ac051f8a0890a": 20, "7771b6b12afeeef21363291d05afb1b333165384e21170bd5c162d2545c78cff": 20, "bf5d56b5ead634ab1a2890c1fe8fa2b6e2477d9edfb5a3064686249d04513073": 20, "023473421ea84bc36c1a906a0ff05a4c6faa2853f885e4435faf41fba6446cfc": 20, "804297b35495a1c29f39207e9cd6d8371c1b2bef059d56c821df4c07a005eb41": 20, "7c221cbc22204497b02ecf9d17ec9aee4bce4109eb988494d812b0b894df7cd0": 20, "5edf89e57d37beb434cdda3c1141362b5b8cfea83388ecbb6b473dd36012a193": 20, "7abb99dd82cd989135061534ce474bdc0d1b007a7e8631ebab0fe651716cbca8": 20, "6d57d1c5dd12c227dea778aea3c6357efc9ed7991d9322c267e6ce6fa0b5ec80": 20, "b56239be0b19d4c410c47f608f8432d3c357aaa75a35e3c5dad707520358af1b": 20, "5cfbb74be27f1717309d6cec09e8f79c0aeca628aa55a72c7dc3dbefa480e0e8": 20, "cebf715fee57237088baeb4c0e21e81d5d801fdff8e8954bf371371aabe2b223": 20, "362c98fdfab9ca9e5614cef39568d4a803f5f60af1cdb072d5d9d3354ced0e0b": 20, "64813e15a8284f1ca2999c882c268a43ebbd138f5bfd87d642d66058af024959": 20, "c1614bbd59f42ebe9c7c2e1a89294c2dce5c8141d6c48391c1566373cef31919": 20, "cdc878991e64c7ab774ff1c8ddce5a5f35d2e0dad142b5195df3a8e11604ab6b": 20, "31c2ce2f69a5ac8cd25e499bd90dfdbb78916ce1658216b5f4f251615b100fb1": 20, "f88f1d185d4cd361a71a34edc50f1fa33f231ceba769a5d9cd469557aad62d2d": 20, "2d8b49f0cb96d0fb5e195fd0fa539af2b8a4745838f95e30c278c0e1d2a7f402": 20, "97a68319661e41fb45b4c0a55a392cbccf83134242353d0e427be90ee371929b": 20, "52d553a0449250a17a110d2c3b54d0ceba29b52340125e95e092ab7bd51c34b6": 20, "d9a9dd2fe9ce9fdbf8814943fdbc1916ad822604a2f82b8f3f5fa0295ca3bf63": 20, "dee0e274b11f1e02c064511d5668f3f2d2b60b35c053b9e4cfa1fdab643427f8": 20, "3e7caac8556739f6fa39da16ab0d5cfd8f8a9758dec8d5d3ea21a366f62fd14f": 20, "d2dec0fc03fd1fed93d7bbf1903c049b66f38b371f100143a8329e99925b3246": 20, "5c1d661302f07c383fd218a2cb50ad5c611a07538e59bc0841dddcd46f6a36b6": 20, "faf3d53497619e940b1b23576ed0ea98a456b1bccf9f709bb66297e2dc804d93": 20, "ced4a236d37f75611a8a441612eaed7b5c22933c28c807229ea3ffc2eb14908e": 20, "2ccef820121c71f71d00268378748eb5d287a83b775ba958af2f0c16fa69bc6e": 20, "d299a0c53a37746b0e51c452e6a90619c5bd6d28d4c35ae5f9985b85c963260e": 20, "b31b18d6144b3f565554bf0ae073badc7d5502b55e1f7b0dfe3729d91576adb0": 20, "0311b3b3a0b5562c571d00955f4dc8c37ba52f6175fa8fc66caf80d681420e3d": 20, "ee788ac730f011d6f3e2b08fdeb86d9f91ff0931e1dbfbfdb95da368d6678bca": 20, "278e89fa6497a7b6f1d58ae63dd3d8cf9ed6e45dacb9bf45024b22685e4be0c1": 20, "72cb0d82e33d2786f06ce9361e21901e2db0a47ad9178340236c530b9a047a4f": 20, "4f71ab5ae0758ac69ca3d9ab88bc99977d0f7b40450d4eaf07f1032b6408782a": 20, "1cb66e512b620196dea1b493253dfe8921146ef203cb1154846b819817477c0e": 20, "131636d69deaadd216302d9412866d45ab942d946c95f35ed38f0e88d130afd5": 20, "96af31682624db50852ff3e49c25658f91d2091253ab91a92b8a0a2281d37503": 20, "9e9908889aa829a0ae9e2cd7aa940a86563e85db0a362044ec22fd5a17f30df5": 20, "460d2ae26be60c42d08e9a71b789ed228c93f284b247eaaf34d7b750ec3394c0": 20, "60e3b5ad9c6fc29b58c690a0244e655061a1769e9a82d8e7a8d661b35c5621fa": 20, "1f99e563b4dcf99000d07036356e836c387dad17a1cb82b7cebee6f1c1a3e764": 20, "94bd1bd07d44cfa1d943a9d1b4c022fff91b143bec4c4250f9caf37e312bc166": 20, "6b99dd88ddd2a86319e10e555a29d2f455150a9b7414e7b1ee1493ecbc02ac9f": 20, "ff81b895235310d102001f3bd7e00de34a7790604806c2493622ee1d62dfb4c4": 20, "1195db50bcbcabcc1c60f38b2934fbd05215af7f576f7dc37961a4e43abe71bf": 20, "525454d111f823a0cc72f22798c1a5add903129dc1fca320e64c7a5da5a33dfe": 20, "688d0629b1bf88eb5494cd5f64cdbf90c8d8dd90ada5a827fd5b1be8198bcf52": 20, "d358c9542258e615b2b003601eda7ed893df11077e73d3f8afab1f72982fddcb": 20, "6fc5c9d21b14bf22c44f139ead9b49b03e73a93ba267d574c7cca0f52635b5d4": 50, "95e155418b461e82bfdd7149f6988aec0b3543fd20e3ff83d8bc056d0a40aad0": 50, "136e16051dcf758bfb8ee2d4ce6e446a2c771ef367c48108f34a815519d71028": 50, "d5af02e665ca4a6421d003baf7a14bbeaf26ee1ccace050603411eb8c16724dd": 50, "41c62d5b56bb7e9b5b85f2e1153680a6371ad61774873da11503f0b1f4353b70": 50, "c4fc2e3f69fd79f7175e5aaaf8e3c89fabca445e0d1190984f909200c872b26d": 50, "da0354422cce9b2734d52b7a82d58e5d2a0242eba76c48cd17826b160a191e3f": 50, "36d694de245f33c6964c57cc1126ed9137b0ad917e44e2fa4a46a230fcd96a54": 50, "a9c141d7cee5385eea4714c417bc8a5e587b983c48867e5b58951fddf63ecd65": 50, "bad57b32fcb3dbea77fd680e3e4de12e9c981a04dd1b07b95b2da151617b93a3": 50, "a3250c8d34f5e3767ab0d89aa11a8d4c6a5f3bd584848dcac44d299145272aa8": 50, "44a894976906732175c074211b28a555d89eb4ca3e5ea3fa1f8f814afd03dd96": 50, "0b2c0b0b00e80e9b6774806dc916e0b3390996211a05a7d677e82abf1a901091": 50, "7ba4ff4719e582b9750df11839b88befd5d348e3bf3fcb67bd07545616aa372d": 50, "746ea03a85c5981ce12c1223f07c71dd926edc74e17442108c082f20b63c8300": 50, "bf3e4223f400cc147f1f7f4a168e538e44b9f9a85796e5cd52adbe6ef79e8cc1": 50, "8906f7a56eb3e2594d521fe7b8c7b260e806961e3b02ad25c240f24b75012f02": 50, "2d1481e9a925762167b28009728c92b4f67677776199d74d20012e85af0cb6bd": 50, "0be7c70929626eac2848ab40d6b362fda74a2ba6c49bc4a6a3cbc1f6fc725c38": 50, "f8b92b27af936ff0f0d7a9662eaded1e1fafc72caba1087e60022f3e9ea9fae3": 50, "b24b8a1ed08644e27daff19b0bd11c7bc469dc2f7daea429cf9eae0b8e10e9f2": 50, "c3100feefa571ae79fe0f9e79b8d54d81f5a3dcc0665dc579294679d9f71afc5": 50, "75316f2a3a60e27a7fd3e6c5b8f6c1ea7e5f84b2ceea6c4fec088863e28be943": 50, "87ff31e612d8a1d0bfe88b6e0c39bc6e4e400611e9bdaad255dace51f2592f94": 50, "3533b563392f487335f4f235ac055bae5882c92e6fc7c53f4a12ef1bb1fd4f92": 50, "acdaa826d43257e92f4ea25714ce8b5a7f15698526e6809115de571deb3b26fe": 50, "c9e196a3af4d5f70364bd34e8d5fd128da02f0f57ee47ef3d7a2b681df5eca21": 50, "c0fd25d2b6426d5397fb35d40da03addb5a0510787fcaca0b9e9015b3e0dba81": 50, "3399227e2da7837f80a5af3b20b285fd66b453dfff517468ddbc1fad835d66a1": 50, "bf700f95897c9f6e4bab3eceac16bbded94891356015ba75e9c901482f3f62e3": 50, "418c5d9fcd4e1ff848e809176fb71c9486b752bcc5e802e199f54fb2b7c9129b": 50, "96544b1b27f1ca731d38d0db1acb650aaaa0e946a0ed6e6a52c6ea4ba8470a03": 50, "30f311593871784c62f3351a7eeec531d6f69a89488cf8fcbb1a74232b0aa395": 50, "895cea6e14f86966d162e3dac584e790bbeb5cfe76d4aeaa97ab96b5f60a7839": 50, "4d5ebc528617a7736554c84d2282c3c19643de47d900a9ceb662f3cd3704ffa6": 50, "f8434be5308903226d68c0a9d148440696819b14b6ca9b2973e4c02b18b32a2e": 50, "cd3b4a496eed161166f8a5c81b4f48aaf1c0a196315a69fbf0913bc49dc8965f": 50, "31e5fb04309cb65e83b03ab2a07df3d798dec91c74e07bcd93825bf49eb90e80": 50, "3304c91dfcfb6871b32e463aa8c2ae683196f832bbfc4e12d1a4df9366ddf24f": 50, "5cb8d32846c1f905a6388019654904dbb12cfa80e46221c5230cbec6ab49d474": 50, "5e1f371294ea6445d39c532e3986f02ad80ba32ec9a4eed832c0140757e65cc2": 50, "7356d7153c8d860f406966772c0d2bf05579bfe50acfccaf7db3f615512a7472": 50, "870916a85e1347f24d9087c7d1b566f217a2cb21097c67b9e11452d47fad8962": 50, "64bda2f42f0e3d4c433b0d946c356845a12fc2f5e072542f4bfdcc892605c6b2": 50, "66203f571b828a8fe42f7f1e8026cb4015eff5c8c817311dfe5f728cba4d42a0": 50, "af43407807e6a1f6b80b91eb054e4bcebc2975d1c5a7f91ff5a3974ffd2a9b9b": 50, "18efbb7590bf033762c841850a8da9eddd4df3937ef8d6720718cbd725bdb837": 50, "b3d6893b03850d56ac2c26b68170c2a5d9932dac93fc3b3c21faa3019cac7c84": 50, "3650ac6b2c09b0c24b65cdb2a81fadc315baefe5aa79a346b38cb0d4f35cb3d1": 50, "f329f2cd3274669a1e4e3cd7e311fd8934448ff227c7a8fdf0e88fa2e90dc431": 50};
+
+        function sha256Hex(ascii) {
+          function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
+          var maxWord = Math.pow(2, 32), i, j, result = "";
+          var words = [], asciiBitLength = ascii.length * 8;
+          var hash = sha256Hex.h = sha256Hex.h || [], k = sha256Hex.k = sha256Hex.k || [];
+          var primeCounter = k.length, isComposite = {};
+          for (var candidate = 2; primeCounter < 64; candidate++) {
+            if (!isComposite[candidate]) {
+              for (i = 0; i < 313; i += candidate) { isComposite[i] = candidate; }
+              hash[primeCounter] = (Math.pow(candidate, 0.5) * maxWord) | 0;
+              k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+            }
+          }
+          ascii += "\x80";
+          while (ascii.length % 64 - 56) { ascii += "\x00"; }
+          for (i = 0; i < ascii.length; i++) {
+            j = ascii.charCodeAt(i);
+            if (j >> 8) { return ""; }
+            words[i >> 2] |= j << ((3 - i) % 4) * 8;
+          }
+          words[words.length] = ((asciiBitLength / maxWord) | 0);
+          words[words.length] = asciiBitLength;
+          for (j = 0; j < words.length;) {
+            var w = words.slice(j, j += 16), oldHash = hash;
+            hash = hash.slice(0, 8);
+            for (i = 0; i < 64; i++) {
+              var w15 = w[i - 15], w2 = w[i - 2];
+              var a = hash[0], e = hash[4];
+              var temp1 = hash[7]
+                + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25))
+                + ((e & hash[5]) ^ ((~e) & hash[6]))
+                + k[i]
+                + (w[i] = (i < 16) ? w[i] : (
+                    w[i - 16]
+                    + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3))
+                    + w[i - 7]
+                    + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))
+                  ) | 0);
+              var temp2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22))
+                + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+              hash = [(temp1 + temp2) | 0].concat(hash);
+              hash[4] = (hash[4] + temp1) | 0;
+              hash.pop();
+            }
+            for (i = 0; i < 8; i++) { hash[i] = (hash[i] + oldHash[i]) | 0; }
+          }
+          for (i = 0; i < 8; i++) {
+            for (j = 3; j + 1; j--) {
+              var b = (hash[i] >> (j * 8)) & 255;
+              result += ((b < 16) ? "0" : "") + b.toString(16);
+            }
+          }
+          return result;
+        }
+
+        var ticketCode = "";
+        var ticketValid = false;
+        var ticketTotal = 0;
+        (function checkTicket() {
+          var m = /[?&]k=([^&#]*)/.exec(window.location.search || "");
+          var raw = "";
+          if (m) { try { raw = decodeURIComponent(m[1]); } catch (e) { raw = m[1]; } }
+          ticketCode = raw.replace(/\s+/g, "").toUpperCase();
+          if (/^[A-Z0-9]{8}$/.test(ticketCode)) {
+            var n = TICKET_HASHES[sha256Hex(ticketCode)];
+            if (typeof n === "number" && n > 0) {
+              ticketValid = true;
+              ticketTotal = n;
+            }
+          }
+        })();
+
+        /* ============ 本地记录（按票码存档：总次数 + 每一次的结果） ============ */
+        var STORE_PREFIX = "muse-acct-lottery-v2-";
+        function storeKey() { return STORE_PREFIX + ticketCode; }
+        function emptyRecord() { return { total: ticketTotal, history: [] }; }
+        function loadRecord() {
+          try {
+            var raw = window.localStorage.getItem(storeKey());
+            if (!raw) { return null; }
+            var rec = JSON.parse(raw);
+            if (rec && Array.isArray(rec.history)) { return rec; }
+            // 旧版单次玩法的单条记录，迁移成新格式（那次结果保留）
+            if (rec && typeof rec.segIndex === "number") {
+              return { total: ticketTotal, history: [{
+                segIndex: rec.segIndex, label: rec.label,
+                win: !!rec.win, code: rec.code || null, ts: rec.ts || 0
+              }] };
+            }
+            return null;
+          } catch (e) { return null; }
+        }
+        function saveRecord(rec) {
+          try { window.localStorage.setItem(storeKey(), JSON.stringify(rec)); } catch (e) {}
+        }
+        function remainingOf(rec) {
+          var used = rec && Array.isArray(rec.history) ? rec.history.length : 0;
+          return Math.max(0, ticketTotal - used);
+        }
+
+        /* ============ 中奖码：中奖当场随机生成，随结果存本机，再打开还是同一个码 ============ */
+        function makeCode() {
+          var chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // 去掉易混的 0/O/1/I/L
+          var code = "";
+          for (var j = 0; j < 6; j++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return "MUSE-" + code;
+        }
+
+        /* ============ 绘制转盘（SVG） ============ */
+        var CX = 180, CY = 180, R = 178;
+        var svg = document.getElementById("wheelSvg");
+        var SVGNS = "http://www.w3.org/2000/svg";
+
+        function polar(angleDeg, radius) {
+          var rad = (angleDeg - 90) * Math.PI / 180; // 0° = 正上方，顺时针
+          return [CX + radius * Math.cos(rad), CY + radius * Math.sin(rad)];
+        }
+        function wedgePath(startDeg, endDeg, radius) {
+          var p1 = polar(startDeg, radius), p2 = polar(endDeg, radius);
+          return "M " + CX + " " + CY +
+                 " L " + p1[0].toFixed(2) + " " + p1[1].toFixed(2) +
+                 " A " + radius + " " + radius + " 0 0 1 " + p2[0].toFixed(2) + " " + p2[1].toFixed(2) + " Z";
+        }
+
+        (function drawWheel() {
+          var softClasses = ["seg-a", "seg-b", "seg-c", "seg-b"];
+          var softLbl = ["lbl-a", "lbl-b", "lbl-c", "lbl-b"];
+          var softIdx = 0;
+          SEGMENTS.forEach(function (seg, i) {
+            var start = i * 45, end = start + 45, mid = start + 22.5;
+            var path = document.createElementNS(SVGNS, "path");
+            path.setAttribute("d", wedgePath(start, end, R));
+            path.setAttribute("class", seg.prize ? "seg-prize" : softClasses[softIdx % softClasses.length]);
+            path.setAttribute("stroke", "rgba(255,255,255,0.85)");
+            path.setAttribute("stroke-width", "2");
+            svg.appendChild(path);
+
+            // 文字：沿半径方向排布
+            var tp = polar(mid, 108);
+            var text = document.createElementNS(SVGNS, "text");
+            text.setAttribute("x", tp[0].toFixed(1));
+            text.setAttribute("y", tp[1].toFixed(1));
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dominant-baseline", "middle");
+            text.setAttribute("transform", "rotate(" + mid + " " + tp[0].toFixed(1) + " " + tp[1].toFixed(1) + ")");
+            text.setAttribute("class", seg.prize ? "lbl-prize" : softLbl[softIdx % softLbl.length]);
+            if (!seg.prize) { softIdx++; }
+            text.setAttribute("font-size", seg.prize ? "16.5" : "15");
+            text.setAttribute("letter-spacing", "0.04em");
+            text.textContent = seg.label;
+            svg.appendChild(text);
+          });
+
+          var rim = document.createElementNS(SVGNS, "circle");
+          rim.setAttribute("cx", CX); rim.setAttribute("cy", CY); rim.setAttribute("r", R - 1);
+          rim.setAttribute("fill", "none");
+          rim.setAttribute("stroke-width", "2");
+          rim.setAttribute("style", "stroke: var(--line)");
+          svg.appendChild(rim);
+        })();
+
+        /* ============ 页面状态 ============ */
+        var spinBtn = document.getElementById("spinBtn");
+        var note = document.getElementById("wheelNote");
+        var resultWin = document.getElementById("resultWin");
+        var resultLose = document.getElementById("resultLose");
+        var historyCard = document.getElementById("historyCard");
+        var historyList = document.getElementById("historyList");
+        var spinning = false;
+        var currentRotation = 0;
+        var record = ticketValid ? (loadRecord() || emptyRecord()) : null;
+
+        function setWheelRotation(deg, animate) {
+          if (animate) {
+            svg.classList.add("spinning");
+          } else {
+            svg.classList.remove("spinning");
+          }
+          currentRotation = deg;
+          svg.style.transform = "rotate(" + deg + "deg)";
+        }
+
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>"']/g, function (m) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+          });
+        }
+
+        /* 中奖区：这张票中过的每一个码都列出来，互不覆盖 */
+        function renderWinCodes() {
+          var box = document.getElementById("winCodes");
+          box.innerHTML = "";
+          record.history.forEach(function (h) {
+            if (!h.win) { return; }
+            var div = document.createElement("div");
+            div.className = "code-box";
+            var label = document.createElement("div");
+            label.className = "code-label";
+            label.textContent = "你的中奖码";
+            var code = document.createElement("div");
+            code.className = "code";
+            code.textContent = h.code;
+            div.appendChild(label);
+            div.appendChild(code);
+            box.appendChild(div);
+          });
+        }
+        function showWin() {
+          document.getElementById("winWho").innerHTML =
+            "运气爆棚，<br />Muse 账号就是你的啦！";
+          renderWinCodes();
+          resultWin.classList.add("show");
+        }
+        function showLose(entry) {
+          var line = LOSE_LINES[entry.label] || LOSE_LINES["谢谢参与"];
+          document.getElementById("loseMsg").innerHTML =
+            escapeHtml(line).replace(/\n/g, "<br />");
+          document.getElementById("loseSeg").textContent = "转盘停在：「" + entry.label + "」";
+          resultLose.classList.add("show");
+        }
+
+        /* 抽奖记录：每一次的结果都留档，中奖带码、未中带落点 */
+        function renderHistory() {
+          if (!record || record.history.length === 0) {
+            historyCard.classList.remove("show");
+            return;
+          }
+          historyList.innerHTML = "";
+          record.history.forEach(function (h, i) {
+            var li = document.createElement("li");
+            var left = document.createElement("span");
+            left.textContent = "第 " + (i + 1) + " 次";
+            var right = document.createElement("span");
+            if (h.win) {
+              right.className = "h-code";
+              right.textContent = "中奖 " + h.code;
+            } else {
+              right.textContent = h.label;
+            }
+            li.appendChild(left);
+            li.appendChild(right);
+            historyList.appendChild(li);
+          });
+          historyCard.classList.add("show");
+        }
+
+        function refreshUi(positionWheel) {
+          if (!ticketValid || !record) { return; }
+          var remaining = remainingOf(record);
+          var last = record.history[record.history.length - 1];
+          var hasWin = false;
+          record.history.forEach(function (h) { if (h.win) { hasWin = true; } });
+
+          if (last && positionWheel) {
+            var midAngle = last.segIndex * 45 + 22.5;
+            setWheelRotation((360 - midAngle) % 360, false);
+          }
+          if (hasWin) { showWin(); } else { resultWin.classList.remove("show"); }
+          if (last && !last.win) { showLose(last); } else { resultLose.classList.remove("show"); }
+          renderHistory();
+
+          if (remaining > 0) {
+            spinBtn.disabled = false;
+            spinBtn.textContent = "开始抽奖";
+            note.textContent = "剩余 " + remaining + " 次 · 这张票共可抽 " + ticketTotal + " 次";
+          } else {
+            spinBtn.disabled = true;
+            spinBtn.textContent = "次数已用完";
+            note.textContent = "这张票的次数已经用完啦，全部结果都在下面";
+          }
+        }
+
+        /* ============ 票码无效：提示并锁住转盘 ============ */
+        if (!ticketValid) {
+          document.getElementById("gateCard").hidden = false;
+          document.getElementById("wheelCard").style.display = "none";
+          spinBtn.disabled = true;
+        }
+
+        /* ============ 进页面先按存档恢复：剩余次数、上次结果、全部记录 ============ */
+        if (ticketValid) { refreshUi(true); }
+
+        /* ============ 抽奖：先扣次数、先定结果存档，再转转盘 ============ */
+        spinBtn.addEventListener("click", function () {
+          if (spinning || !ticketValid || !record) { return; }
+          if (remainingOf(record) <= 0) { return; }
+
+          // 中奖概率 6.6%：先按概率定输赢，再落到对应格子（中奖落奖品格，未中奖在其余 7 格里随机）
+          var segIndex;
+          if (Math.random() < 0.066) {
+            segIndex = 0;
+          } else {
+            segIndex = 1 + Math.floor(Math.random() * (SEGMENTS.length - 1));
+          }
+          var seg = SEGMENTS[segIndex];
+
+          // 先扣次数：结果当场追加进存档，转盘还没停也算数
+          var entry = {
+            segIndex: segIndex,
+            label: seg.label,
+            win: !!seg.prize,
+            code: seg.prize ? makeCode() : null,
+            ts: Date.now()
+          };
+          record.history.push(entry);
+          record.total = ticketTotal;
+          saveRecord(record);
+
+          spinning = true;
+          spinBtn.disabled = true;
+          spinBtn.textContent = "转动中…";
+          note.textContent = "转盘转动中，好运马上就来…";
+
+          var mid = segIndex * 45 + 22.5;
+          var jitter = (Math.random() * 26 - 13); // 格内 ±13°，不压线
+          var finalOffset = (((360 - mid + jitter) % 360) + 360) % 360;
+          var curMod = ((currentRotation % 360) + 360) % 360;
+          var delta = (((finalOffset - curMod) % 360) + 360) % 360;
+          var target = currentRotation + 360 * 6 + delta;
+          setWheelRotation(target, true);
+
+          var finish = function () {
+            spinning = false;
+            refreshUi(false);
+            if (entry.win) { launchConfetti(); }
+            var targetEl = entry.win ? resultWin : resultLose;
+            setTimeout(function () {
+              targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 60);
+          };
+          var done = false;
+          var onEnd = function (ev) {
+            if (done || (ev && ev.propertyName && ev.propertyName !== "transform")) { return; }
+            done = true;
+            svg.removeEventListener("transitionend", onEnd);
+            finish();
+          };
+          svg.addEventListener("transitionend", onEnd);
+          setTimeout(onEnd, 6200); // 兜底：过渡事件丢失时也能出结果
+        });
+
+        /* ============ 中奖撒花（克制版，主题色小彩片） ============ */
+        function launchConfetti() {
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+          var canvas = document.getElementById("confetti");
+          var ctx = canvas.getContext("2d");
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          var colors = ["#8b7bd8", "#b7a6f2", "#c9b8f5", "#ddd2fa", "#e7c46b", "#f4b8d0"];
+          var pieces = [];
+          for (var i = 0; i < 90; i++) {
+            pieces.push({
+              x: Math.random() * canvas.width,
+              y: -20 - Math.random() * canvas.height * 0.35,
+              w: 5 + Math.random() * 5,
+              h: 8 + Math.random() * 6,
+              vy: 1.6 + Math.random() * 2.4,
+              vx: -0.8 + Math.random() * 1.6,
+              rot: Math.random() * Math.PI,
+              vr: -0.06 + Math.random() * 0.12,
+              color: colors[i % colors.length]
+            });
+          }
+          var start = null;
+          function frame(t) {
+            if (!start) { start = t; }
+            var elapsed = t - start;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var alive = false;
+            pieces.forEach(function (p) {
+              p.y += p.vy; p.x += p.vx + Math.sin((elapsed / 300) + p.rot) * 0.5; p.rot += p.vr;
+              if (p.y < canvas.height + 30) { alive = true; }
+              ctx.save();
+              ctx.translate(p.x, p.y);
+              ctx.rotate(p.rot);
+              ctx.globalAlpha = Math.max(0, 1 - Math.max(0, elapsed - 2600) / 900);
+              ctx.fillStyle = p.color;
+              ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+              ctx.restore();
+            });
+            if (alive && elapsed < 3600) {
+              requestAnimationFrame(frame);
+            } else {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+          }
+          requestAnimationFrame(frame);
+        }
+      })();
+    </script>
+  </body>
+</html>
