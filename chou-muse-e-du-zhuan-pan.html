@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+    <title>抽 Muse 额度转盘</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #faf8ff;
+        --bg-grad: linear-gradient(180deg, #faf8ff 0%, #f6f1ff 46%, #f3efff 100%);
+        --surface: #ffffff;
+        --surface-2: #f1ecfd;
+        --ink: #3a2e5c;
+        --ink-2: #7a6ca8;
+        --ink-3: #a99bd3;
+        --line: #ddd2f7;
+        --line-gold: #e9b949;
+        --pink: #ffb7c5;
+        --pink-light: #ffd9e2;
+        --lav: #b7a6f2;
+        --lav-light: #c9b8f5;
+        --primary: #8b7bd8;
+        --primary-deep: #7563c4;
+        --primary-soft: #ece6fc;
+        --seg-10: #efe9fd;
+        --seg-20: #dfd2fa;
+        --seg-30: #c9b8f5;
+        --seg-40: #b7a6f2;
+        --seg-50: #8b7bd8;
+        --seg-0: #fbf3df;
+        --seg-0-ink: #a8894a;
+        --seg-ink: #4a3577;
+        --seg-ink-strong: #ffffff;
+        --warn-bg: #fdeceb;
+        --warn-ink: #b3261e;
+        --shadow: 0 12px 32px rgba(139, 123, 216, 0.15);
+        --r-card: 24px;
+        --r-btn: 999px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #17122b;
+          --bg-grad: linear-gradient(180deg, #17122b 0%, #1e1838 55%, #251c47 100%);
+          --surface: #251d42;
+          --surface-2: #2e2450;
+          --ink: #f2eeff;
+          --ink-2: #c4b6ec;
+          --ink-3: #8f81bc;
+          --line: #453a6e;
+          --line-gold: #e9b949;
+          --pink: #ffb7c5;
+          --pink-light: #ffd9e2;
+          --lav: #b7a6f2;
+          --lav-light: #c9b8f5;
+          --primary: #c9b8f5;
+          --primary-deep: #e4dbff;
+          --primary-soft: #372c5c;
+          --seg-10: #352a5c;
+          --seg-20: #443672;
+          --seg-30: #57448c;
+          --seg-40: #6f57b0;
+          --seg-50: #8b7bd8;
+          --seg-0: #38301f;
+          --seg-0-ink: #cbb28a;
+          --seg-ink: #e3d9ff;
+          --seg-ink-strong: #ffffff;
+          --warn-bg: #4a2326;
+          --warn-ink: #ff9d94;
+          --shadow: 0 12px 32px rgba(0, 0, 0, 0.40);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg-grad);
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+      }
+      .page { max-width: 480px; margin: 0 auto; padding: 28px 18px 40px; }
+      header { position: relative; text-align: center; margin-bottom: 22px; }
+      .petal { position: absolute; pointer-events: none; animation: drift 7s ease-in-out infinite; }
+      .petal.p1 { top: 0; left: 5%; width: 16px; }
+      .petal.p2 { top: 30px; right: 7%; width: 12px; animation-delay: -2.4s; }
+      .petal.p3 { top: 82px; left: 12%; width: 10px; opacity: 0.7; animation-delay: -4.6s; }
+      @keyframes drift { 0%, 100% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(7px) rotate(12deg); } }
+      @media (prefers-reduced-motion: reduce) { .petal { animation: none; } }
+      .knot { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; }
+      .knot .kline { height: 1px; width: 62px; background: linear-gradient(90deg, transparent, var(--line-gold)); }
+      .knot .kline:last-child { background: linear-gradient(90deg, var(--line-gold), transparent); }
+      .brand {
+        display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+        color: var(--primary); background: var(--surface); border: 1px solid var(--line); padding: 5px 12px; border-radius: 999px; margin: 0 0 12px;
+      }
+      h1 { font-size: 32px; line-height: 1.2; margin: 0 0 8px; font-weight: 400; letter-spacing: 0.02em; font-family: "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif; }
+      .history-card h2, .odds-card h2, .rules-card h2, .result-prize { font-family: "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif; font-weight: 400; letter-spacing: 0.03em; }
+      .hub-bell { margin-bottom: 1px; }
+      .sub { margin: 0; color: var(--ink-2); font-size: 15px; }
+      .sub strong { color: var(--ink); font-weight: 700; }
+      .price-line { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+      .price-line .price { color: var(--primary); font-weight: 800; font-size: 15px; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); }
+      .wheel-card { padding: 26px 20px 22px; text-align: center; }
+      .wheel-wrap { position: relative; width: min(80vw, 320px); aspect-ratio: 1 / 1; margin: 6px auto 22px; }
+      .wheel-disc { position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(150deg, #f4efff, #fbf6e9); border: 1.5px solid var(--line-gold); box-shadow: 0 8px 26px rgba(139, 123, 216, 0.18); padding: 7px; }
+      @media (prefers-color-scheme: dark) { .wheel-disc { background: linear-gradient(150deg, #2c2148, #33291f); } }
+      #wheel { display: block; width: 100%; height: 100%; will-change: transform; }
+      #wheel.spinning { transition: transform 5.4s cubic-bezier(0.12, 0.75, 0.06, 1); }
+      #wheel.spinning-fast { transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+      .pointer { position: absolute; top: -7px; left: 50%; transform: translateX(-50%); z-index: 3; width: 0; height: 0; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 22px solid var(--primary); filter: drop-shadow(0 2px 3px rgba(110, 84, 190, 0.35)); }
+      .hub { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; width: 74px; height: 74px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 3px 12px rgba(139, 123, 216, 0.22); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; pointer-events: none; }
+      .hub .hub-name { font-size: 15px; font-weight: 800; color: var(--primary); letter-spacing: 0.06em; line-height: 1; }
+      .hub .hub-sub { font-size: 10px; color: var(--ink-3); letter-spacing: 0.2em; line-height: 1; }
+      .seg-10 { fill: var(--seg-10); } .seg-20 { fill: var(--seg-20); } .seg-30 { fill: var(--seg-30); } .seg-40 { fill: var(--seg-40); } .seg-50 { fill: var(--seg-50); } .seg-0  { fill: var(--seg-0); }
+      .seg-label { font-weight: 800; fill: var(--seg-ink); text-anchor: middle; }
+      .seg-label-strong { fill: var(--seg-ink-strong); }
+      .seg-unit { font-weight: 600; fill: var(--seg-ink); opacity: 0.72; text-anchor: middle; letter-spacing: 0.18em; }
+      .seg-unit-strong { fill: var(--seg-ink-strong); }
+      .seg-miss { font-weight: 600; fill: var(--seg-0-ink); text-anchor: middle; }
+      .spin-btn { appearance: none; border: 0; width: 100%; max-width: 320px; height: 54px; border-radius: var(--r-btn); background: var(--primary); color: #fff; font-size: 17px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; box-shadow: 0 8px 20px rgba(139, 123, 216, 0.32); transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease, box-shadow 0.2s ease; }
+      @media (prefers-color-scheme: dark) { .spin-btn { color: #2e2154; box-shadow: 0 8px 20px rgba(183, 166, 242, 0.25); } }
+      .spin-btn:active { transform: scale(0.98); }
+      .spin-btn:disabled { background: var(--surface-2); color: var(--ink-3); cursor: default; transform: none; box-shadow: none; }
+      .once-note { margin: 12px 0 0; font-size: 13px; color: var(--ink-3); }
+      .ticket-status { display: inline-block; margin: 0 0 16px; font-size: 14px; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 7px 16px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+      .ticket-status.invalid { background: var(--warn-bg); color: var(--warn-ink); }
+      .ticket-status .left { color: var(--ink); }
+      .history-card { margin-top: 18px; padding: 22px 20px 10px; }
+      .history-card[hidden] { display: none; }
+      .history-card h2 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+      .history-list { list-style: none; margin: 6px 0 0; padding: 0; }
+      .history-list li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14.5px; flex-wrap: wrap; }
+      .history-list li:first-child { border-top: 0; }
+      .history-no { flex: none; font-size: 12px; font-weight: 700; color: var(--ink-3); background: var(--surface-2); border-radius: 6px; padding: 2px 7px; font-variant-numeric: tabular-nums; }
+      .history-prize { font-weight: 700; }
+      .history-prize.miss { color: var(--ink-2); font-weight: 600; }
+      .history-code { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; }
+      .history-code .code-text { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14.5px; font-weight: 700; letter-spacing: 0.06em; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 8px; padding: 4px 9px; user-select: all; }
+      .history-copy { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--primary); font-size: 12.5px; font-weight: 700; border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+      .history-copy:active { background: var(--primary-soft); }
+      .history-note { font-size: 12.5px; color: var(--ink-3); margin: 10px 0 12px; }
+      .result-card { margin-top: 18px; padding: 24px 20px; text-align: center; }
+      .result-card[hidden] { display: none; }
+      .result-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 999px; margin-bottom: 12px; }
+      .result-badge.win { background: var(--primary-soft); color: var(--primary); }
+      .result-badge.lose { background: var(--surface-2); color: var(--ink-2); }
+      .result-prize { font-size: 34px; font-weight: 800; line-height: 1.15; margin: 0 0 6px; }
+      .result-prize .unit { font-size: 18px; font-weight: 700; color: var(--ink-2); }
+      .result-msg { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+      .code-row { display: flex; align-items: stretch; gap: 8px; margin: 18px auto 0; max-width: 320px; }
+      .code-box { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 12px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; padding: 12px 8px; user-select: all; }
+      .copy-btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--primary); font-size: 14px; font-weight: 700; border-radius: 12px; padding: 0 16px; cursor: pointer; }
+      .copy-btn:active { background: var(--primary-soft); }
+      .result-tip { margin: 14px 0 0; font-size: 13px; color: var(--ink-3); }
+      .odds-card { margin-top: 18px; padding: 22px 20px 10px; }
+      .odds-card h2, .rules-card h2 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+      .odds-list { list-style: none; margin: 6px 0 0; padding: 0; }
+      .odds-list li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 15px; }
+      .odds-list li:first-child { border-top: 0; }
+      .dot { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+      .dot.d50 { background: var(--seg-50); } .dot.d40 { background: var(--seg-40); } .dot.d30 { background: var(--seg-30); } .dot.d20 { background: var(--seg-20); } .dot.d10 { background: var(--seg-10); border: 1px solid var(--line); } .dot.d0  { background: var(--seg-0); border: 1px solid var(--line); }
+      .odds-name { flex: 1; font-weight: 600; }
+      .odds-name .tag { font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-soft); border-radius: 6px; padding: 2px 6px; margin-left: 6px; vertical-align: 2px; }
+      .odds-val { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+      .odds-note { font-size: 12.5px; color: var(--ink-3); margin: 10px 0 12px; }
+      .rules-card { margin-top: 18px; padding: 22px 20px; }
+      .rules-list { margin: 8px 0 0; padding-left: 20px; color: var(--ink-2); font-size: 14px; }
+      .rules-list li { margin: 6px 0; }
+      .rules-list strong { color: var(--ink); }
+      footer { text-align: center; margin-top: 26px; font-size: 12.5px; color: var(--ink-3); }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <svg class="petal p1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5C8.2 6.2 5.8 9.8 5.8 13.6A6.2 6.2 0 0 0 12 19.8a6.2 6.2 0 0 0 6.2-6.2c0-3.8-2.4-7.4-6.2-12.1Z" fill="#C9B8F5"/></svg>
+        <svg class="petal p2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5C8.2 6.2 5.8 9.8 5.8 13.6A6.2 6.2 0 0 0 12 19.8a6.2 6.2 0 0 0 6.2-6.2c0-3.8-2.4-7.4-6.2-12.1Z" fill="#B7A6F2"/></svg>
+        <svg class="petal p3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5C8.2 6.2 5.8 9.8 5.8 13.6A6.2 6.2 0 0 0 12 19.8a6.2 6.2 0 0 0 6.2-6.2c0-3.8-2.4-7.4-6.2-12.1Z" fill="#FFC9D6"/></svg>
+        <p class="brand"><svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align: -1px; margin-right: 5px;"><g fill="#FFB7C5"><path d="M12 2.5c1.4 2.2 1.4 4.6 0 6.3-1.4-1.7-1.4-4.1 0-6.3Z"/><path d="M12 2.5c1.4 2.2 1.4 4.6 0 6.3-1.4-1.7-1.4-4.1 0-6.3Z" transform="rotate(72 12 12)"/><path d="M12 2.5c1.4 2.2 1.4 4.6 0 6.3-1.4-1.7-1.4-4.1 0-6.3Z" transform="rotate(144 12 12)"/><path d="M12 2.5c1.4 2.2 1.4 4.6 0 6.3-1.4-1.7-1.4-4.1 0-6.3Z" transform="rotate(216 12 12)"/><path d="M12 2.5c1.4 2.2 1.4 4.6 0 6.3-1.4-1.7-1.4-4.1 0-6.3Z" transform="rotate(288 12 12)"/></g><circle cx="12" cy="12" r="1.6" fill="#E9B949"/></svg>MUSE 额度福利</p>
+        <h1>抽 Muse 额度</h1>
+        <p class="sub">转一次，赢 Muse token 额度<br />最高 <strong>50 亿 token</strong></p>
+        <div><span class="price-line">付费抽奖 <span class="price">¥0.1 / 次</span> · 凭链接抽奖</span></div>
+        <div class="knot" aria-hidden="true"><span class="kline"></span><svg width="26" height="16" viewBox="0 0 26 16"><path d="M13 8C10 2 3 1.5 2 5.5 1.2 9 6 10.5 13 8Z" fill="none" stroke="#E5484D" stroke-width="1.6"/><path d="M13 8c3-6 10-6.5 11-2.5.8 3.5-4 5-11 2.5Z" fill="none" stroke="#E5484D" stroke-width="1.6"/><circle cx="13" cy="8" r="2" fill="#E9B949"/><path d="M12 10c-.5 2-1.5 3.5-3 4.5M14 10c.5 2 1.5 3.5 3 4.5" stroke="#E5484D" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg><span class="kline"></span></div>
+      </header>
+
+      <section class="card wheel-card" aria-label="抽奖转盘">
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <div class="wheel-disc">
+            <svg id="wheel" viewBox="0 0 320 320" role="img" aria-label="额度抽奖转盘"></svg>
+          </div>
+          <div class="hub" aria-hidden="true">
+            <svg class="hub-bell" viewBox="0 0 24 24" width="15" height="15"><path d="M12 2.5c.7 0 1.2.5 1.3 1.1C16.6 4.4 19 7.3 19 10.8c0 2.4.6 3.9 1.3 5.2H3.7c.7-1.3 1.3-2.8 1.3-5.2 0-3.5 2.4-6.4 5.7-7.2.1-.6.6-1.1 1.3-1.1Z" fill="#E9B949"/><rect x="3" y="17.2" width="18" height="1.8" rx="0.9" fill="#E5484D"/><circle cx="12" cy="21" r="1.6" fill="#E9B949"/></svg>
+            <span class="hub-name">MUSE</span>
+            <span class="hub-sub">额度抽奖</span>
+          </div>
+        </div>
+        <p class="ticket-status" id="ticketStatus">本链接共 1 次 · 还剩 1 次</p>
+        <button class="spin-btn" id="spinBtn" type="button">开始抽奖</button>
+        <p class="once-note" id="onceNote">本页为付费抽奖（¥0.1 一次），中奖凭码领奖，抽一次少一次</p>
+      </section>
+
+      <section class="card result-card" id="resultCard" hidden aria-live="polite"></section>
+
+      <section class="card history-card" id="historyCard" hidden aria-label="本链接抽奖记录">
+        <h2>本链接抽奖记录</h2>
+        <ul class="history-list" id="historyList"></ul>
+        <p class="history-note">中奖码都在这里，截图保存，私聊店主凭码领取额度。</p>
+      </section>
+
+      <section class="card odds-card" aria-label="中奖概率">
+        <h2>中奖概率公示</h2>
+        <ul class="odds-list">
+          <li><span class="dot d50"></span><span class="odds-name">50 亿 token<span class="tag">大奖</span></span><span class="odds-val">1.0%</span></li>
+          <li><span class="dot d40"></span><span class="odds-name">40 亿 token</span><span class="odds-val">2.2%</span></li>
+          <li><span class="dot d30"></span><span class="odds-name">30 亿 token</span><span class="odds-val">3.8%</span></li>
+          <li><span class="dot d20"></span><span class="odds-name">20 亿 token</span><span class="odds-val">5.5%</span></li>
+          <li><span class="dot d10"></span><span class="odds-name">10 亿 token</span><span class="odds-val">7.7%</span></li>
+          <li><span class="dot d0"></span><span class="odds-name">未中奖</span><span class="odds-val">79.8%</span></li>
+        </ul>
+        <p class="odds-note">额度越大概率越低，结果按以上概率随机产生；转盘上的格子分布只是展示，停位不影响中奖概率。</p>
+      </section>
+
+      <section class="card rules-card" aria-label="活动规则">
+        <h2>活动规则</h2>
+        <ol class="rules-list">
+          <li><strong>付费参加：</strong>在淘宝付款后，由店主发送本链接，打开即抽；<strong>链接里带几次就能抽几次</strong>，页面上方会显示剩余次数。</li>
+          <li><strong>奖品与概率</strong>见上方公示，每一次抽奖结果都按概率随机产生。</li>
+          <li>中奖后页面会生成 <strong>666 开头</strong>的专属中奖码，每次中奖的码都记在「本链接抽奖记录」里，请截图保存，私聊店主凭码领取额度，丢失无法补发。</li>
+          <li><strong>链接不要外传：</strong>链接里的次数是共享的，别人用你的链接抽了，次数就少了。</li>
+          <li>额度发放以店主确认中奖码为准。</li>
+        </ol>
+      </section>
+
+      <footer>Muse token 额度抽奖活动 · ¥0.1 / 次</footer>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var PRIZES = [
+          { key: "50", label: "50亿", prob: 1.0 },
+          { key: "40", label: "40亿", prob: 2.2 },
+          { key: "30", label: "30亿", prob: 3.8 },
+          { key: "20", label: "20亿", prob: 5.5 },
+          { key: "10", label: "10亿", prob: 7.7 },
+          { key: "0",  label: "未中奖", prob: 79.8 }
+        ];
+
+        var SEGMENTS = [
+          { key: "10", cls: "seg-10" },
+          { key: "0",  cls: "seg-0" },
+          { key: "20", cls: "seg-20" },
+          { key: "0",  cls: "seg-0" },
+          { key: "30", cls: "seg-30" },
+          { key: "50", cls: "seg-50" },
+          { key: "0",  cls: "seg-0" },
+          { key: "40", cls: "seg-40" }
+        ];
+        var SEG_BY_KEY = {};
+        SEGMENTS.forEach(function (s, i) { (SEG_BY_KEY[s.key] = SEG_BY_KEY[s.key] || []).push(i); });
+
+        var CX = 160, CY = 160, R = 158;
+        function polar(r, deg) { var rad = deg * Math.PI / 180; return [CX + r * Math.sin(rad), CY - r * Math.cos(rad)]; }
+        function buildWheel() {
+          var svg = document.getElementById("wheel");
+          var NS = "http://www.w3.org/2000/svg";
+          SEGMENTS.forEach(function (seg, i) {
+            var a0 = i * 45, a1 = a0 + 45, mid = a0 + 22.5;
+            var p0 = polar(R, a0), p1 = polar(R, a1);
+            var path = document.createElementNS(NS, "path");
+            path.setAttribute("d", "M " + CX + " " + CY + " L " + p0[0].toFixed(2) + " " + p0[1].toFixed(2) + " A " + R + " " + R + " 0 0 1 " + p1[0].toFixed(2) + " " + p1[1].toFixed(2) + " Z");
+            path.setAttribute("class", seg.cls);
+            path.setAttribute("stroke", "rgba(255,255,255,0.85)");
+            path.setAttribute("stroke-width", "2");
+            svg.appendChild(path);
+            var g = document.createElementNS(NS, "g");
+            g.setAttribute("transform", "rotate(" + mid + " " + CX + " " + CY + ")");
+            if (seg.key === "0") {
+              var t = document.createElementNS(NS, "text");
+              t.setAttribute("x", CX); t.setAttribute("y", CY - R + 42);
+              t.setAttribute("class", "seg-miss"); t.setAttribute("font-size", "13.5"); t.textContent = "谢谢参与";
+              g.appendChild(t);
+            } else {
+              var strong = (seg.key === "50" || seg.key === "40");
+              var num = document.createElementNS(NS, "text");
+              num.setAttribute("x", CX); num.setAttribute("y", CY - R + 40);
+              num.setAttribute("class", "seg-label" + (strong ? " seg-label-strong" : "")); num.setAttribute("font-size", "21"); num.textContent = seg.key + "亿";
+              g.appendChild(num);
+              var unit = document.createElementNS(NS, "text");
+              unit.setAttribute("x", CX); unit.setAttribute("y", CY - R + 58);
+              unit.setAttribute("class", "seg-unit" + (strong ? " seg-unit-strong" : "")); unit.setAttribute("font-size", "9"); unit.textContent = "TOKEN";
+              g.appendChild(unit);
+            }
+            svg.appendChild(g);
+          });
+          var rim = document.createElementNS(NS, "circle");
+          rim.setAttribute("cx", CX); rim.setAttribute("cy", CY); rim.setAttribute("r", R - 1);
+          rim.setAttribute("fill", "none"); rim.setAttribute("stroke", "rgba(122,94,196,0.16)"); rim.setAttribute("stroke-width", "2");
+          svg.appendChild(rim);
+        }
+
+        /* ---------- SHA-256（纯 JS，用于把票码换成哈希查表） ---------- */
+        function sha256Hex(input) {
+          var K = [
+            0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+            0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+            0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+            0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+            0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+            0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+            0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+            0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+          ];
+          var H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+          function rotr(x, n) { return (x >>> n) | (x << (32 - n)); }
+          var bytes = unescape(encodeURIComponent(String(input)));
+          var bitLen = bytes.length * 8;
+          var msg = [];
+          for (var i = 0; i < bytes.length; i++) msg.push(bytes.charCodeAt(i) & 0xff);
+          msg.push(0x80);
+          while (msg.length % 64 !== 56) msg.push(0);
+          /* 64 位长度：输入远小于 2^32 位，高 32 位为 0 */
+          msg.push(0, 0, 0, 0);
+          msg.push((bitLen >>> 24) & 0xff, (bitLen >>> 16) & 0xff, (bitLen >>> 8) & 0xff, bitLen & 0xff);
+          var w = new Array(64);
+          for (var block = 0; block < msg.length; block += 64) {
+            for (var t = 0; t < 16; t++) {
+              w[t] = (msg[block + t * 4] << 24) | (msg[block + t * 4 + 1] << 16) | (msg[block + t * 4 + 2] << 8) | msg[block + t * 4 + 3];
+            }
+            for (var t2 = 16; t2 < 64; t2++) {
+              var s0 = rotr(w[t2 - 15], 7) ^ rotr(w[t2 - 15], 18) ^ (w[t2 - 15] >>> 3);
+              var s1 = rotr(w[t2 - 2], 17) ^ rotr(w[t2 - 2], 19) ^ (w[t2 - 2] >>> 10);
+              w[t2] = (w[t2 - 16] + s0 + w[t2 - 7] + s1) | 0;
+            }
+            var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+            for (var r = 0; r < 64; r++) {
+              var S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+              var ch = (e & f) ^ (~e & g);
+              var temp1 = (h + S1 + ch + K[r] + w[r]) | 0;
+              var S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+              var maj = (a & b) ^ (a & c) ^ (b & c);
+              var temp2 = (S0 + maj) | 0;
+              h = g; g = f; f = e; e = (d + temp1) | 0;
+              d = c; c = b; b = a; a = (temp1 + temp2) | 0;
+            }
+            H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+            H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+          }
+          var out = "";
+          for (var v = 0; v < 8; v++) {
+            var hex = (H[v] >>> 0).toString(16);
+            while (hex.length < 8) hex = "0" + hex;
+            out += hex;
+          }
+          return out;
+        }
+
+        /* 票码哈希表：键 = 票码（大写）的 SHA-256，值 = 该票可抽次数 */
+        var TICKET_HASHES = {"0012fa60201239c9b30245f15e47431b0475b40ec7b0553f544e49b7d06392b6":1,"0026c143ea0f62cbb97e68858ac05127b478ee5bae98c7154b742b75af853434":1,"016f4ce2e95660ade10887b538dc69275e95f5c353c857485ce0a843931f569b":50,"02abcc529a92771de7dcc602526e22336e524c9220ebb1d23a99d3218ae95aa8":1,"02ebe3e3bb15ce8a70f7237c9eea315b154dc6932e5fff1b124ad7fce872d464":1,"0337e588950afb76f88991cfd03c91e40cf809ac5ad681f87e4c5f969e029fe2":20,"04712925896c616ee1e5bb6c43d740759e97c34516616a3fb1a003110f1cbb6d":10,"057462ece5f4d5301bb7091234baa78199a5ebd1ca038c34b799a6bb7d8a5aad":10,"06387ffbc11b1cc6ffcdc57af01426588339d380001cb15cdd27b2e363dec5c0":5,"06ac8763be40d19723b813192d5be5bb228694a6acd288c88333e3854620d737":5,"0750b6f5f1a4ee167da9d96d13e1c9db467ee1907bb96969229969d4038e465f":5,"0783d4240891bfd3b845bd152218507d9570b6b9a9666b1fcf81eaf1b3112c62":50,"0828fedf97f2a90c51fd1bd3a392ddae3469e2fde22bee2a8a4402f603ef241b":50,"0841650734215a9093ed0008ac6572a432d23bfc33ba1a8731f7f1d8603d6cb8":10,"088330c73860327a59473396d79a5b4c97f5da206f021719ba7c11aec80110f5":1,"09a9ea6a71d033332a45c5d83787c3266278dd80408651caa89458647303107d":5,"09bbb4eb31f7d3aa3a41de76be43ffdf76d4497a3fe1d8bec8a1559dbd02d3b2":1,"09f2099a8b78c998d9608e100f31e5d2445e0ef607549feff39956401c429aee":5,"0b9b29e50547d0ed49416e4675b57321fefe984d663cb1b45808b6bd0d0a00c7":1,"0c3e0628e6934f6df19c418970eb3d2e6094bd73c53d65f307917709aba7b335":1,"0ce6163435813b9304e70dfbea6bfb15f8985832f392f733f01a256084536014":1,"0d0841e48c260911b72ef10d0e3ba6f5f035de7a650fb9f5289e1666bb3bfdc0":20,"0d24b63384c24961a24b580c0622eff7e8478d768ad313bcf279fc49afb9020d":1,"0dc4eb905e8a1226dc5974790bd465310091547ab9370978ec1da9d95cd873dc":5,"0ec1505c1b262e42c96678df7c197aae416bfe79c7620135265804c97800f227":1,"0f0d258a4a5fcc061206b46595fe4b69d54820112d4d45abeb7a1129dabe0297":1,"0fe46378280903a55b787d0c470502551d769f27a3231b31b92618d577e250bf":5,"104a6ef2ea7c3c9ba0a310f69427d6e97548023cde72ae1d25897a1fdb671410":10,"1134f4865246e94ed8334db73847b89597485e0a9875b61ef35093524f6a9c1e":1,"11ae9b42e0d0ebc82162cae87cd166fa8261e284c73d3ffa9c3a8c4d9ff044b3":5,"11e6c2acece4bdef6bbb7ede340de1bbb8f2d363a9aa1f71accafac93b704f8c":1,"1276e4d7f8b44f3af3e60f0b878bfd584dd91913f5f1637856093c5683a50ff0":1,"12dd444878a541af6e9f46b7d138b773c35f8d4a9219b7c4f7dd76482a083bcc":1,"13286e2b43e4289deb4aff6d1c515f6d67b11b5ef81efa648a2c2aa47e7a78ad":5,"13c834e93beec6a355c81685bb1f95ccd0bda542e93b3a337d04f04501510fa5":5,"146a62d81af9f4bfd2ce2169d661cf2bdc2b8bfed4100e59151fecad19d78e03":50,"14ef667362c7ebd336b63bfd2a46d80daaa183eea34e50e4316c17be22e8057c":50,"1547979d357b4e6557a97460696a5fc48a4024c05dfbe102109558a010136fe8":1,"159f5d7b95ac021f234efe05c11a840c08438bcf9eec1fbcf029b362df088ffc":10,"15ebbe34123f5c6381b38d2dfd5ed4ec9a08d3adf01e89e19f80cf49ed7166ed":10,"161b58f05ccb45e1cd19618284bee3075b2e44ab78336f1de26b4949dbfc59d9":1,"167e562d30763bc390894d9eb83cf2c43bea6f273f61c98dcd3b8da0321aa0a0":50,"19027d0ade864aa1e8445f4009afcdbc2a4f8d08bbadd25b4ee9bb045477f965":5,"1980442256eb6fd989761f25f8a6dda557fca9ebf0cc41da5f8075a7f4adb72e":1,"1a806fb3039c8ab0cc6e1a33d6bce03fbe48d7febbd78a0dd0162d5184bbbfbd":1,"1aed4fc515c0910255041df6dcb9bd6e1483771289591074b22f59f68fc9cbf7":1,"1aef66ccf81f8623a3094b213b084a28514b798f1b07b1f2f9e5d4f4680c0266":1,"1b50d56f8ba002882bbdc6f854f064a151474c0044281577c29919680204ce04":10,"1b8f1a6995fcf95d4d6191ea451fb7ec3600a549b006156c4a23a04644c34123":20,"1d20799cd8089c1f93ff93e99632d549f5ab565ee6090c1a33311861fefd5592":1,"1d2f1def86a4321053693dde46b05a755c6f7e16c4b2da2eed71a9ef65a55622":20,"1d59dca93fc4209db4024ca7c745b2258081bbe23fa953511a703604b2dabf2d":1,"1d948867e910c2fe81afc0bddaaa8d1cffdcbd4b7dad94f6e682c64b556efa81":1,"1de3d10fd0c6ee47f0adf84544836de85a822c7ca8713ad3a3b0cfd6ad2a361f":1,"1ee6a1478f8d46c53d2f185fdd12c9ddfdc7adc8a10ceaba9c3a39ed33771944":20,"1eebfe2de61793d887bfccda9578c5ab13c16c67cf00de234a8a9716da908c55":1,"1f26959680006866fa61bb03858a8d0b90847fc3c42a65de388fe737efb14ba8":20,"1f35c76fe5376b19cf508dfe32bd391a4083d589f64cd678e6a36beb0b085b8c":1,"20d792cca29ececafdf461f35b25254698c0f0f2ac12875981f8c9aefa7095db":50,"2140d5ccf673bb674c95980b434f663fa5e9768a491276015284512e3afcf2eb":5,"215c98b925fa442b79a0622fcccb9b99a0e0fd08c4379baf4ae3963d166539cc":10,"22685acefa04f97e812d90fd6a3d558029f1f79110f1c92d41cd89c77c110115":5,"2280fc2c7fedd67e841e82bc4958f6861901ad8cc35ee08f6c96daad16245656":5,"22a39c14c85a4c43fa1f44d49033b66868d1cf12de18af0e2a79c977afe0d4d0":1,"22d7b6b0edbb0f5331c397d7b6446b3a007f9258f655c23211cc446f1eb2c755":10,"23e133b5dbb70bca957078aec56ca7c36f2b3c802acb4b713368274cd6fe46ec":10,"246ac4de7e5a5a6aa5fc7ff8f56ed10a7fdaeaf26d10e8be33c895029041389a":20,"249f8bdcaad5c45dc921bf3551c5b1e0f4491868e1eae6280a55ed742c0a9f30":1,"24d4c55c95784253aaca28590f32217b5a08c81dd913a901092a247f90719675":1,"24f015110419ce7139ca99717b55ec293b2b6177d549992c42534b1eb4f16c03":50,"253f35668d3813e288f049c75a9da2ce16e7886c9a193fd02d1a4ac7166d2790":1,"254fa6a9ba52fe483039f4734f6719fa3aa32c0ee7e91c460ccd9ed523b46526":1,"256d7dd0fdc32c2ef9b8c81844c3af0c67940639f4ad276f51e40c999bb8e08d":10,"27113c5f873007367b26997ff00cd7db572ed3d3e27041a2a1152cc9f4143e58":50,"272e35e052e144ed2c3bdb795a6a70d5a226d4730bca4e24d1de9bfa339b7a72":50,"2808122cdd8c6f0ec90993f7076a1ced90b9b84eb5e6a81284383b0fb35cf453":5,"286da49cc816dd47b6c0cd1d24fd57092d796bba5c0ad7a9c9c55c812d1d088c":1,"28d9d20919f995607f1c3576bfd74330f7ea2f69e718efd4b498af9ba4518be5":5,"29142844684bee8417eb00855e28f2695459bb2f18f35b6c2f15f79c4cfeb2b6":1,"293c787096c3f54b63d8ddd88958f951a1532e3782b11825265cb286f7999f71":5,"29a39a58c451af58f15ec91a53a8b1c6805938882cb11390e5295af907ef8502":10,"2a7d3b9ea0e3d592a41e2afd1ecb48d7f5465cf3435b8cef79dd751e92a3abf0":10,"2a95da30a5de720dc735765c0e99755338f6a20f15dcf13519b354cd6cb337d5":10,"2aaf5938e22cfbe16b2a90674218fc840fde0ab389e38a69729aa83a86a60faa":1,"2b912d01f7a2644a304dfc2a7ee3b02664a394f2b6fbbbdad367340f73f162fd":20,"2c6cca5177ccf5025a181cd8af74eca5e4cd450d61f7ef02d1419be2737edfd9":50,"2cbefff807cd142fe3f2a996abab4e1d9cac0376c1bee61a9a7bec8a70c5a2a9":5,"2cef70a1897941d53ad7210007af9aa17999a3497891795f1dd18a3eb0fb35f3":5,"2d343b621bb927e0a07d0687a0e4217d61578291fd175d56e300b9975ac2bed5":1,"2d38e88bf4a254eceb4cbdb61af0fa90a1da6c9130c9bcffd6d9ff9c074d0cb5":10,"2d48ebcc40a9f885c982ef24928056fc37843590782cf4c3ba0871ac97373925":5,"2d5c2bc486fc1c1390580cbce1c82258339f97ffbfb55f9717a0ab47f985b60d":1,"2e8c009d4aa2b9fcc85e317a010559fb74b458d433abc3f2363365c8dd4c84d7":1,"2f540e9d0549254f8cb9efc47ce02183d641464f6b29afb3eeac10345f68bc16":1,"2fcf6a257f265da9a0eecb9cc1dfd9aa07659d476f55f34dc7690b34cbcb1661":10,"2fdd045b42a3b2033a379f685a70db5f3dca7d104024b5af7263fb27ba37b784":5,"305b26c2dba8bd569cf17806ae8a881df59e3c046e35c495e64656450c3b6a2f":20,"311d577d5db18ca567cedb4841886d22736aeed808e1fb953cdcd7fee3ea655e":5,"312091e3116bc15554bcd092bed91a97f49d3d2a0a002a055f364a3c01d81fca":10,"315e9ab834cfddb7553b800eb1b8800f096f8a1eaac075d9c05ac46f7a6a555a":1,"316c141ad765cf3d0be432c72738994b871d0e7bb14d534050827cccabe32590":20,"31a0b105831ad9d761330f6bf93cc9b87924b69fbe38fe50675895414cc2357d":10,"32b7a641f54b113d4542edabe671d277a812eb9f948efbf6024815be160ad24f":1,"336eb0f99ee10a414eb842bfca541a313b5f10bbc71c20dd22124127b41447af":10,"346c063bc714f49f234b4fc98a40b64e6774a441f90819682fb97d689a49c5f0":5,"34dd6ea422e53751e1c48607aa7d1b5ff23cc6097e9353e9d70dfd9acc48b940":5,"3635013d544480db39d77085b59bc35c7ecf441f73ee564580449e808c7a348f":20,"3641de2f4e71b3233179f55a744c1f7c8c675c3d2523230b1fb15a8579c5e85c":1,"36b53b85550584dbded7cc37116be9ed0a1dbfc848375dec0a92df42bb040926":1,"36da79d93fa6df480434efba1989c14110d76427a261e610f4b7078723312b0f":10,"36fb6907893b86d63c887618c35b8b4a569428607f79e2af9b9473cf575ed066":1,"377ef9a4c47357f6eac57e475ae6c69eff417c9dbe9f09fab3bfc1f5ffbe0046":50,"38135a0b24128dd01c3231bac07b35dbd8dd7225c2b87f134c6c2363bd676edf":10,"387b42e3fe9d77bb2f9a5e9437fc01b0e59c621201262b125650f4bbae849072":10,"3887bcbf757cf76f57abd25210a0629fe3bf5aaeb7c03eb4b708438d017b1874":1,"3ae720375827acc4291fbc6d18975c95b7b5dc778b0740e5fe05470df26f96b9":10,"3b3a4fc35d6253401493f5cdfe735d123748421426f7d950ee6008d8970a22f4":10,"3bf38e0a183deb4c7d8f380340a5404ba30e6b3cee7aea533a21648c107165cb":10,"3c385215d788c87ec441121f57f1486a5944b03fc299dc749c4d5ab3bc89b656":1,"3d1aa592a814d64fe73d51694143fc09b73fab3e99fb855b27975821e548b61e":10,"3dd6617d0505a103013a91738d6e35a1d16679a25a11d7eaf99e2767352f2aa2":1,"3e0a8cea3e996f4e6da1f28142df1c35d8b0beb258202b7aa383034da5d28f54":1,"3e64dae642af4e6722ba1e4930bc9b8fdad1ad4cdd1e053fe2954c4863532112":10,"3e8e2f94853c62e75e992d23adb2af2dd4b93362d75f70f296d8e5d4468b7891":5,"3fccabe153f7a51947089e89f0d6594d882a0bb677e0392daa05a902d29f079e":10,"3fdc94d9c1f6a0ac57b446e4052e3b93dee87e01e8b07e8be8b9c6ca5c485801":20,"4014e172270d7856e73f7a1b3c6926b739018952e1ae97ea21cf5730b0a729a7":1,"40a86e394d8a4a3e38b7b48d3e4f31d338d427735d1ef44b8e9edb2d2005dff0":1,"40bbebab9eeebb0250fa2ec56493d3b833cad53f8cfd87b96e63810ddea4bbff":1,"40c996b64894c747f4791b046bc9e787dc9cbb93f8b63682d5ad9e228c9721a5":50,"4145531d376cd3dee348bd1ad8d4192b2802f0623ccc857b511c41b765e62235":1,"42594c8f34faf0406801b07fe9d7772831142f3809602c64c3a6082ae4541dda":10,"4291e55da8aa712f7ddff141a94e6ae511ed4cbca93df51d65d7559941789f87":5,"429231ff8c91e8a62584d58066020f57a840112a7d029ec0d19413be9259c389":20,"4360b8ab6b9d8bed1d2c7cfcc694ebd0e759ec60f5774c592a840264e6b58ca6":10,"43aa016f90a32fcd49d3afdeb73bc8d2c0924089f641ec93dc5fb7b8c85723ec":1,"45141ebd267deba2027f3af3fd6d7a3232162ad1075761890b8a417905ae0135":5,"4523d9c1fef2bba7dc6b695081e551a0dde352f7b83564462fb5b98cc7cbaed5":1,"46c856c70b6c54685aabc7c795c9da98cec73c4a327d45b0c2c3aff6f498914b":1,"47cfc111decbf1517b3c93e0bdb8287cd3a2112c9aee0ab92e34480bf9aa1164":10,"47ff64a72780a103e75a049ba8060147ba519b53eb0092b484266f2891e21fac":1,"48ab883a36f8d14401b14793fcbe98500b0a1491f231e92ec131fd36d8c3d3b7":10,"495e9ff0b7131da3abb0b309b446a7f2500d9dcd5a6ccca10df2425d8b55a2d6":1,"496743d92ad6375d699906235bb9595e719c879fd9ca6043e690c3bd0319b7c2":20,"4a0d6bdde1fae9737119d73d448f269f13db4bbd09ddee928c50cc0a77d58a63":1,"4a3c71c27a4a9fe1c2b9fb4b3ce2d53a0d18a3af43241d7f9160bc688d99b640":5,"4acb08b1f3bc0bf5c60a32d9fcf679f9759992a495ddae9ae764a4afa066fb30":10,"4badf918ca78eeb301d69e698ffc06af67fd1c9be4e3f42c26bc65fba9e0721b":1,"4bd445803f3f8aaf4fcbc7d908acce8c1c9df8de727ac5ef0bcddb5b95da6d54":20,"4bd7e161eddc71ca72366ee2e4901196fa5cda880b161a717ca3694e5b8af2a5":20,"4c0349930e3ac4ec2a34ca5a66ce485f53a0512cc6bd21800073860933afdaba":1,"4c45cae0a7581dbd2b5c8f40199d5a2d24a92a62ba611571493f84016bea7561":1,"4cf03132a986fee106a8beeaaa81495f99f959169bdb75c17f8fbe5fac41eac2":1,"4d0f6e2503757aece5b147423a46f5c506bd76f0d850ca0d38957636d0c9894e":20,"4d383042a47c1e1ff9df0e3d1ea86f075ef1c87f52a6d40f9d7ebd4630212dbd":10,"4d6f1dc720c68267cbf25c8768f4d88d977b650ebfb75ebfd238b84930b71818":5,"4e8b5dd4cc6ec5e99048d6fcd9ea084dd6c10f57ad65acbc53c0db02dbd36c32":20,"4e8c707dbe1a3960c747c5d7b51db08d328b6266699fe310437eef40d11463f0":5,"4e9971dec3bab2051d26faed2241a09ae37e3af3ab4c58ddb8718a67f3d98d45":5,"4ea04f89b325aa6ca6dfb7433583ba50faee50c063e93f53bf04a300c624fc75":1,"4ea6165ed13bee4b7a86df40c96f2455caac1d28fef14aaee3eeb0afca4859b7":1,"4f6d841f3d324da90848c8afa8962846ecb6759bfc9696a0e5cc9edd0f130394":5,"4fab2e59c8263a21a234023c8750b20dda3b1d6ae2c91b165404904e1c8ebd62":5,"4fd0133e0c19c2ae94bb15d90fc8bababdfb6fe89b187086207b3e7d550d76ea":1,"519573db67d314031f24b37b632155b5048d5cd29b19fb3266588a45762dba8f":50,"5252a80380d0a9f1aba9601abf40a181afa5e0050e92e543bb2e8ac84da8caf7":50,"525d12944d315de5fa25a313cb05f50ed16be647c44383960718ec3ced1141bd":1,"558bd56bf096305d6a6ba1f37f4f03296132eac388de5013056415139924f530":20,"558eac8ea2ea58901307acdc80c707e102dc131bba6f35d186c5fe1ef5b80ba1":10,"5810ddb5b5222e2ed87e3a33a369c079dda42316e7c1cacce9f9afca3aa9dd96":10,"5830cc7592d1ca7fe73d938b9f4a94d08301debb580d28cfa519f9968f7bb485":5,"585dcb48066b7db6e7f3db55ef1f0132139c2b13719271edbb95650d54111401":50,"5959fa49fa43f73d91f9051f3c907da1b4a037f8febc0f3158cece6d6b2b9c63":1,"59696b9872fd645645b1b2a7b4026e3461e2908547627dc345e60f25b66abe12":10,"5a315af1d377e134a8d2f9ab7951a5ef794c7225435a606cd1e7e09312252afa":10,"5a5a59a6f5a0a2e0c88aef812ceacfee2c3b7129b42df952fee488473693bace":1,"5a76bd9c617da008e1a8c9661adea8850781b8d4bd86dc49cbeef60f4084787b":50,"5abb1ccb147c6fdbbed3a1fbe2e46eee2f1b2a0a342e29bbb843c3ae2a466ebd":1,"5aeebf7f115931445a0e1c42b3ce5462578ea6a63cfebc40ad11c56c7a4448c0":20,"5af8b8cc5b14c4ad513f08cbc0ef43f4387b62fe46d862a7dfae0d43add26f91":1,"5be8665ed1aeb87253bd2d00515ad29ba65b466705dccd1bb475d4615bdc1edc":5,"5c15340585fed44ead4bbc0fcef86f39b218c8c3201730dfc475912f153911cb":1,"5c9cf9623b4123b5a7406c81cca82b0965c6bdc5bf5d050d71d21d1e40610763":1,"5ca7e07f40292b2e7b264e8e087d7ee44357058a4ecdbaf52f253a2dd102e639":5,"5cfa2972b10c08a1c9d6efe424cb0c27f20f65d1836c0b607d5503698ea21879":1,"5d233c6f490e89da5f155d6cde88fe108c65d91da447e503687a96142689e742":50,"5e8a4226a66fdc6e5f06cfa6c1b5f63556e39ebf594cad260ba300e68fc2cf33":10,"5ee8035175279bd33c3c1eebe1477caff53195449e1901c9ba44d2aff4cf4d2d":1,"5ee84df889f08626e02e781147341a75241546e4e5079371b93f1e979df5c394":10,"5f31d3198faf444beb3fefbc1f487a98ee844794c6c62cfb2e16d2034e391cbe":10,"5f51bf8c928fc799f6d654384d45f352ce806dd56a919c2ce4aef51ce3837896":5,"5f847a1e3d0d100fa038d2c7186683232e1c83317b59208b02f3b1d05e3e7fa3":1,"5f964b26cdae2e2ab19f67e1fcf3ffb07a8fd86210095d5136cb08f1ffe0a7dd":1,"5f990d017e4ff7d29aac469cce789f15997472d8d9d69ec98fdc1c08284e09e4":1,"5fdd20e73bf9e72665a7898c7855f550601caf44362bb61ffb54a0901b1ddbd3":5,"604c7c8045f5c92db6778146b352e2de2ae03298fb84e8a4d8005ad0516c84fc":5,"607acd144c8595a1a4787f8de96f6389dad3959669e5398543d9713137171cd0":5,"60af3787bd3c32966af97559109d9dee7a84c1aea02a61f682aca36c08b6d037":5,"61a21b7b0f11aad63ec3391827daa686d2227aeb3c49e109f25767b04b99780b":10,"62a32743db6dd78ce0e7256b7ae411f2ad20f8588a9f549a2cfeab78f5356bad":1,"62d4508772ebb80bf181c54463458a6976d8c5c09d4e8de917a388793533ff6c":1,"631d2b1f813b5a41391e7d240be3ed695eecb874baf59fe43f968223c497866f":1,"632c51b797555ca953d4ee3ee26aeaf3a1b69618fb47b8debfb7e0bb97bddc01":5,"635c3b33dc22b711b8a939a0892992be84726e97aac4b8a00d6274ea0198c095":10,"63aad8f7df95a3a8dd63629a9e6cd8aaacb1fcab1344d5dc36b0179948021040":1,"6409408657a110a8f5af1673b296159089319ef67ebe08ad30fdc4807cb45b77":10,"6451d914ff3fcf451ca2d0ebe8c2fe2ae68119b90ed254efbb9e7cb2e48e9708":10,"645dbaf27a856fd89f93c0be77429827bb845e9d2ad40b510a1a941f1ef5c0f5":50,"64d8a7859fc95b7752feeaa767690647df987a1ad3cf0f8594fb85f53d6d0b5d":1,"64fb2858d4d6cec80ed5ca3b865674b597c03e85a35d20a563af6b083c827aeb":5,"6595a1e2e45a0dd2ea0471ed8018caa7917b8ee2ecd432e75ef2bf84e2b5284e":10,"65fc72a0315fb1160f27953dfa25cbfbe43cfd1b474591981ac4374201eb08f5":50,"668c5b9ed477db0437f3f23947c437346604e8b8c71e7901dce0a08571d4e2b2":1,"67195f8a2bdddd675d433fbf005d2320212f5c31a279552f15671b4c9fdd1dff":1,"673a577b25e6ef7d8724bdb574c03e7841e4c129e7840e3c588d1e54b3e513db":10,"6761fd98ff2b7ccdcec64e310fb2535787538f761f2a047e37653919393a69d1":1,"68123f7111a6278c04e4cdf46c51f61da3d7397b632105418a9c503e5e942325":20,"68b5ff6de5898b6eef6ef3a4fe52fc3ec114adc0a23660d246897e4d267d0608":10,"68c6ad1f9b089b8d44aaec6155530ad5fbbe65923c77ccc8d20d8288f108e797":20,"6938767104816f9dc927a25cae87be0b297162c1fe99886b1fb9e2c4e3bfb9d4":5,"694e13849e6a9afec10985ffa93e65860f71e7476addfd2f3d07dc2f23eee98a":5,"6cae0fdabb375c9997da7cd14602f47d4764d0ac1a38fcc7fd6b847ae7541fa9":5,"6cdd345ca65849c50dda6c4a83c5435991751a25245d03124cd78d75202257b5":1,"6deec7589c486b55154f574a8bcabbf49ce4e4527ff7b40b3093fb8ad4edccef":1,"6e0ae2c65e636dc5080a3a7574fb41de8464ea578f63136fd2928dc622b2534e":1,"6e9cfaf2d1ee7fcac0e789e0048962c4772daa251889b3dc80f8dac8db51fb39":5,"6f025134918c2c72abb3001d9cbf6bbee227b1e5fac4107d97ab34130eed30b6":20,"6f45a7f4cebe5c44836f66c9da6a88976887b5b6b3f1e2c2bf52dec0b15b94a8":5,"6fa067d5d0ccca06e8b0cdc4ad7fa08bdbb1a866bd5f5af5b1382c4786ffb5c7":10,"6faf4965d39c6e80280953a3e50d121a65f26cec71c7a5669c566a51267aa8a2":1,"6fbe2aeeb8ac7e4d596837bb508156d9f96550ee7f8d4112a7351154f8e66c59":1,"6fc55914b6bc8ae44bfe864a4b2e74bcb376de77eacd58e4d2f9503204081042":1,"70227aa4b917c52f3139ace51c0d9ab7fa509433c1053922b85f952058e38fb8":5,"70a7c468fc4fc93edb752426da94baf893eb09cad9b62ddab790c14ead9a046d":1,"710b79b84fe0eb6cc02f5103532ff7be5e2b6bdad503b4212de347102d70b139":1,"71337ed65c901fd12c1bcb68d46d7ebe64a6645f7e81edf7e9498695a26cd08a":1,"713f99f8b48d66592583799da80b9d8a15407fca5a29b79e3b8ac4f26340d329":1,"7254102dc0d6478f34b09b4275fbe0d0d026e7520fe5e59292712a6a60494d4b":1,"725ed920d224df56509d4fc5d6b3452e817889f4cdb9f1f39c8342f645b24665":1,"72754856abc5c2288e04f99d9636ba3a48886137d2c3d8b1ad804f893476a882":5,"72f7e71b951eba44c34be464696c660e04b9c3cd00686d20cd01fb81e9b2bf12":50,"7342ab044c5062e0fb302adedebac9c91303b0f76d8d804b3d74f6ebbdcbc9ac":50,"73a958786bc32bd020b0c5039447c1353c260f4f1e0874d00e0f18bf90c83fa0":10,"7449daea4215d2a0f81c392a880368392572e16cfb18ebfe594371a5aa1adff7":1,"75d3f0e6939aaf7e11276cbfdc1eefb2bd9cce5fc9340362a0d946736cb2f3dc":10,"76409b2c0905d83456a79b933bd68a7b7b2f5caf294daa5c8e89d339ec0825ab":20,"76d106dabc3fcdbe56741fad8bdddb5c84a4fc60cd9f939acfc5f8aec3e9d9e8":50,"77079d0569fd08c67edaf33e54ec95dcd4b0cc807b422f58553c5194ab340cf4":5,"779b9d43a1d2fd3e7178466bdd43ef6cbe2e227a108bc1ab17bcf14850eac640":20,"7823a7f8139badc81fcd5d23f5e51865214d864d37f8853e79185b934140fefb":50,"787dc2bd8bd126f65b60e497b5e36a2fbef8bf357f4abd0fec38150c972446c3":1,"788a8ad2da27b87752761c2bd9e3671e953ecc97b327c9ccfba5570cbc249927":1,"78a27254f87bca913ac534b84b7118f4b901637a160deffa5621e1ce6b2e0e0b":5,"78b1d41bf03069a68c0e80f0175ca1e3ed8a7a5a44bcbb2bf5173913bc728ce6":5,"78c5bf0845022037ba387ea2b6bb3e768ce0f972a42ece4b6f3129a67edddda5":10,"7972586ade7aee0c96c6d7e20a91e443f93e3ad67c2fa1d3259620a51a6762a5":50,"7994fd7e00cfbbc3113530cdf1cc16cc19bddc5c441419034519ba53df36befa":1,"79c4ad64c73119dbdc3840e6c49b6b7bc782a93749e0ccf630a69e97f21828d4":10,"79c4b283f09cae3c553a6231cc4e39db37b6aa0494b74429c9d790cf33c690e4":1,"7a07ef77a7922b900f028ac5f23dc17eaddce9de4f6620a20e07343a08e4cc7c":10,"7a3806bba133ab96f90e9fde6d1b841fe35bc377608f02a43b67099b1650b4ae":5,"7b46026b4a74cb1e0a509e103892873b23c77f3791a6638676b0aff3d177b3e5":1,"7b6e3e23407be2402a347fdcf32d3d46a87997d0fe39a960d88da62bc5fa721e":50,"7cab6049d095635e63418b377338cfaca521393656d7c93e0519d82cd5e149e7":10,"7cc73a81ccfa55df809faa233ba9a4d4ce1e4566be620780dca4eeeabfb39f2b":1,"7cfeb55151f1b5beaccdc938ee57c0699fb54848940c956478a1d0b3ee8eda85":10,"7d547f896eb09b839d8aea39fbd5768fa71b6bc09b2209fa7ad0806c432038e5":1,"7e5814cb31c106399e6ce2135ae3c1473d7e898d0aed93878fd4b06f09b03e65":1,"7f0caf5a9c3aa670f6fd2b77fd64370a2b03ef71155c03d8cb326e99aae28a22":50,"7f3e2c3020d59b265fbc7dbc9e12654a6d658c353cee2a403224f64dd0c74eca":1,"7f75f6a924582a6d1a855be0f940cc2ebeb40fb0bb3f5e1800425163002c0456":50,"7f9f65873f20c4d1ad68e501557709818ffb9e23627cc15d795cd009acc388d4":10,"7fe6b17b77e64fdb57fb5cb754b93db8a0633c9d08bddee9d85219ae985483a4":1,"805bf85bedf6d12c522e137ccd7eed9100b821f566ac74b20a4a446d62d585b7":10,"80a9e0d1fa3b40e2899146c04c940a5971a35e4fc88a357414c8cc2bc2174e48":1,"81ca2c79156d47a123247bde62a8f99bdab361481d79cad278f5450999aa9c96":1,"8222f3ddfb5a3ea2b596b72ff4fb54848d57dc08e049bb582c125f134757d33c":20,"82af965355df32b0e305df49cf050c344ce14457e16575feb48ae83ce19ba811":1,"835d702acf411c18b7bea881a063c1b90954625746869089b00f1f2c8cf243cc":5,"8391d3cca4f63ed46a633384a8c585c72da3123f0fca62d618e844a517962381":5,"83be5126e131c98d08f297169fda1c4c6e7cb877692d2fc636ab4869e70dbbba":20,"83e90418c6b3dcf3fd20042650d777258f839923a0afb876ad2545e3548b3299":1,"83f59513b73f6233913d0f9b353da499f6fc57f904c17b94139a425072aa3de9":10,"849212732b5a418d56eedef67869c0d7773b94a0d434eb175e3687451b26bdcd":1,"84e0eb6c0505140aee7497711abb7f6fd22c35de7464b63c3d2cc4292187b8a9":20,"853dc14a4b19b7adde661ba7d31a0ffe03c0d8f7cff1363fc527449cd6b4b8ba":50,"85a7d1bdf14c7c457638d18f17504aee15380ac721872bb3fe1c68c55171c444":5,"85a8c3c35ec564eec26ba25a12412ac3de98d396e75b5732ee5a4e6bcaa6bdb8":1,"86e476c60b638b6dead7e35899c743a07483b85a6fc09a22d23a9e269f61017e":1,"88f4a61c6fe5972102bacf3e28d14f1d93f2e43c6430d30309b26f29bcca456b":1,"89c3bd385adf536849cfc9c3649b597c62a8a7612f29cc13dc2d5ebb280f5a67":1,"8a113346a31bb5ecd6153ea11c73f658bbc62268d9d99c348fbf221541037eed":1,"8a1661d2c61afc83e835dcad4dc5053ce7bc377055512d475878311e179aeea3":10,"8bba40c3fc97f7fd9ce38444b767f8955ee1cf653ca26abb318d3b94f730975d":5,"8c6ebb111877f1339b16e35877a65131b2890ed6b43c6ec8d719e3f31ab0ce91":5,"8c6ee6268a8d256fa069261e6fa2e965141708b8fe74485437bb6c69f98caee7":50,"8cbdbda818bac3f552c52db71b7fa2b3faee6a8e4c3ea872183ee9e6681dbdc1":10,"8d0ab340ab59a5bc3c230697f496b60af85e5750202e021b2ea9fcbf052c0fa5":5,"8d6bc26fcb501303153163a25e7bda1d6ccd0252a3f9a51c14a45ac837426d8e":1,"8da7b57ab161399ca347946665a7f82578af9544dea0d9b468feb695c95c7602":1,"8e13350289e30fab83a92c55e01438145731f763af358d0e12e0c00a37418776":1,"8eeaaf4b99b7251ec0257b0838d75afffdfbc1eeac9f17742e1c796a4cb546bf":1,"8f9576ba609cbc41830d0937372cdfd9c5cb688b649c2ded98b6b86cbd664981":10,"90d60a4f5735c13272804c0953da750587282499f00f7f23f3151a19bc033169":1,"916334d100680487cb3ab84317ab52602958ca9eaee0553793b2618f045e36d4":10,"91a127eb9c013957e41bc9d21a06794cc9b06f26c2b313270edc74e98468a568":1,"91bf7df4b25fa9302a94d95bb45975c7279c66bfddca8320c5dff1317d95f5c2":20,"91e7b04980af005dc470413acbf4cdccad3ed31cd304537f9eb3e4e9bfca324d":10,"922b479fdd5032f13493d22d822fe0ccc69247d5e1234834bef3cbf0960e72c9":5,"927e40f0336f8557296843a8b20d21d833b6199c9174176cec4e4669397cab19":1,"93566188379ed9f3abe42e589b223232a178e6407625a5c43152d2cd06c07ae6":10,"941f1a9ec04c599335793c278fd3f6420a9fdd82ee9fad210857306c0eee5008":1,"95243907445edcfd1ffaf99f2e513ae2dec79a828a7c139799dd1a29e1378fab":5,"9550cd63e0e345e559fc6aa90559d64c80ed419b2d125df79d1c7887659edc08":5,"958768cb51f1b40d2b74aa11528fb6f8e947272aeddacdd13abf91e8376bb5f8":1,"963e71a80f48f4ddebd0c23c4acd9cc8be8b5e7beafdf753aa1fa7cdc757182b":1,"966b71e821639565279a98c10bca0e60501706cc85de1ed4d101d7e2dbfd0d46":1,"96cfb851bcecd37f6623f59a32a3cce77239f1085a025ff5de40fd3bf68d8af0":5,"9759d0e7a3b86828ad02ff19876c72b0ad8496a4896fb27c1ab38b80ffc8ff54":10,"975d82246d089e95bdfe70b695e4f1d888c61e1897c099d4ac26c2d13cb5449e":10,"9842b29c09c5ff66555a307ddc0e53c8bf2bc84fbfbccb6b16d2525784fa00f9":1,"98d5a4fe9e48ad59436972db6bc24e6cccdcc742fa1988d36f5cd03e06454f5d":5,"98d99bc108f1e2fc2aba2f57bd5efd508d27567d8014602e4121ad77df7d1f86":5,"9927b56c028cc9701fa8b79857722637832026233549291795a53498cf8f6748":1,"9a3ee86b041223ad354377b8fcb67ed00aaab3d7b232001a99b329e4d6cb4d46":1,"9a9a5faa2fa824845129dbc0e6e41bc2ee9f8f05a52159d192f6df62b4035cb0":10,"9b3eb29e326e432d0a7a9968bd5c2adfcf0f895ece48f05b3f952d13ac1f2475":1,"9babe5d0d64f62007405856556824460d95f75ec99567896c258912e37d1092c":10,"9d16a540d47ad39a817d57a68dcb8b916d57c448ee643822bb65bdab03e19d6d":5,"9d5fba5ea463b463209b3f122613d7e1d8f6c2e2e6a058ef17ec8629a0da417d":1,"9dee2ebc01cba71cedc64f46ba81fee765d24ace7439d4faef03607570fb947c":1,"9faaa46bc1b1afadf1f1c6bd33fb9c29a3b1f94be4208543f1d3f51c4d66d445":20,"a05dd4cbedba0dde63412cf5c8d26f3a4b1309999029e5037590df9cc0d0d229":50,"a06f6b47801a24898aac3472060256d5ab03b59dad742b06522a28b14739017f":1,"a0d9f67cf9f4fdcf3fab825c766f91cd0c2554efe8a0a375ce59ece0a41ec63f":10,"a0fec8b2277762aa76d5444b63b4fcdc198e12ac817c6c74f1bf20a4ed504e4f":10,"a1136747def0da87f6c548c7dbac0d6d8ffaea12239724b5e33c0f8a17193c98":1,"a1b91df24f1d2655df30a19173535275c132ab3d4c56fbf7597af60b8836b967":50,"a1bd669bc42074a1b81085b27d6ec78ac0aced4131bc7d3d2d8295da9f58cfeb":1,"a1f0c8a6b6ebe5e1cd1d49012eb6bd8bd36563a944a0ca264bd0cd7d9f916d10":10,"a2169d9158d41359ee9eea907e1963888cfab1c73875c6424caa9be0a1406d9f":1,"a24bf7b54634361cb942b2e11bef78984670ec3d9703eb594b231d82930d800c":1,"a4475f78365126701cb4f153319736d21bbfb3689e2731d2a81dce55b86d3952":10,"a7b79f4528565a2a81d02fac9db23e19b8b488e41325e9db75f4af9f31aa80b4":50,"a7bdb721112694e8071c5bb8f3e2b65a2b8f2e338eba5209629572a18ace723a":20,"a7ec4cbb535b6182ce1415db8134bd538c681ead4786cfaada9949a13307de8c":1,"a80012a65d9538cc1a364edf5be82bba625fb4ab989ffe6d039e71df03d83ff3":1,"a88965f46247e8689a6fd7a776330a6f5176bb4d05318fd17b55599416b92bc0":50,"a9f4a519ec1b99ffc58f324940d6c214981e1147ec9c52ade652e69b08d707b4":10,"aab07dd736786e2102bd7ac4378897376dc5b6c21399f24c18c8893b5857397a":20,"ad5c78725ab85778bdc198377479153d098403eae9cd69cbb704d6a4be8fc7b5":10,"ae97f12dd3454bede752271e41cc95c4a55a9d2149226ca68ac04de9407cf661":10,"af393778ae7cc40779441d913274315c72d13e8b1f52ab76647562497eb77b11":1,"af7d15f391a8c284058a88a7f4721cc234e66d29b3617359cdef1de60d5d47c8":10,"b064519a9600ad6d12f73814136904301ef1ae51c77735797a69d489d3d74005":1,"b1fdd2f61cc4ada87f18893c6cea622cf668a20b803956f177d601e89ac78dca":1,"b3083b35394d989cb57b723255e3f017fd0576f492ed7fefcdd766594cc43939":20,"b36687e8fdbd84651f61835ac3edbc8de43a4cc6910ed8d1a4e662727d59516c":1,"b391337f6749c322996b427b60649731c48033fe5f2f08ee975276ccbb5f7163":1,"b4354c717844e928c5d4cc866ccd908d163f17291f699fb83530035083b52c31":5,"b43be7a04a85279966a0a670851700943bd5776f0dddbf45c21e41b193d1820d":20,"b447f124bb10de7f2e61233978fb3acb7500385745c26b6ba51fbaefe6c7f9fd":5,"b4d182ad77bdff3e0d2a7d0b1beb05bc135b9ad0b8a54355909240660ef0cf22":20,"b5c573b71cad798c48c588d0e05c18516b18ed8c93761fc0515ec7302284e47a":1,"b6b7002eb28833b7e7d781b0154c9610c2e8dec09fd83e00446a235a2a13827e":10,"b6d6322f2e07595b5d2842674f44934d5a00f2cfbc840b7b66fa01fd1954361e":50,"b7f38f9048bdcc456ac7070bf2474b9d193221be66e89eae1c419dfaf4a19b58":1,"b83846565a129b555dd57046e2a71c7bb3b1c4396e7bf30dc8aba5d7d49ade2c":50,"b88f445084a22a811d15efadb0c05920a07ace07fa8263a7d8b2c7fb8c11398e":10,"b8969c02c4e0ff3b19d51c1bd7dc636633bc3926ad80a8b06f781dc6be65b1a9":5,"b8b2360f9cb8b1a6a12aca4b39307660ae05c82b31c772c96504ed97ad24372a":1,"b8d59f705c38548ff76d3efdf79f1b9cd6ba65bbc08aba7ef8c1146b1db47c12":1,"b93b314fd48c99cf5121fff8cfe3d02f4f35095f046c12a215b6771aa2a54a31":1,"ba594ba415349767c961d2fd94219c123d963fcd3d66ea66d4942bafafbe15d6":5,"bababa52109325c505e53e46d4095a1cc9e99e434d79ac2ef8e0650185ebbcf2":5,"bb74fd39fdeed540b767f4a7eda35f4c997292507d22fc4b28a50e0dff5f11f0":50,"bbb9f1b2727e08aa93e1817464abb13ee9eee25dcb37675549a19e0399ccdfeb":10,"bbed9f1276d0dde74aa77af27bf453099326ab9d8241bae77b5e72d4ff28adc4":1,"bc52941d3bec9eab26bbf3314a7dfc1702cbfa106a9b76e222fc8e97201d990c":5,"bd22941ba3b2b6be3dc350513f4cdd673833ceef4fc27bd41518fc643849dfdb":50,"bfad588c6f646d7a5207fb99c71b511b6c862818e3bab3004e327cb743594b17":10,"c05f571e37a93766c123d0cdb60cac0c7a6ad706e1dd3a9442d9c217babadfc2":1,"c0ebd5c299f5cdbaecb61c52a69a06d78e1a4d58e0e180a81773b723c8ea4bc2":20,"c176ed8bc93c294746952a35a44bb17f5fc9acbf8edf1cdad872baf109d840fe":1,"c1a3f12a10632fe5405483756a08650196b14014345dc8dd0527db73d549abba":1,"c1d777d92a24553715b448bfe21b83deb1ad69729ba6174ec378c2f2e7c5e393":1,"c21cfa474066bf4a6f749ab139d269fcbcdbae8b18d74f278076e3614668ec09":5,"c220eee8e2717c8ff702558fee76dee918eb79b0a1133726d8f7e10fb0c7e6e9":5,"c249eff6871afe38e9332e9accc3707c9adce014688ccf1e1b3e776c4f599b60":5,"c26b386a55662dc2245835b952547171ab8c337cb476ba3fa2e15ed4b3f6234e":1,"c2a40335e863faa9eb864618e813c2b65cd92627edf282d47dde7ce78e05636d":5,"c380bf5883b59652f6fdeedd47015e83086cc1bc050459f6f2037a478b524929":5,"c3e9b94937b9d1c48eb1f824d192c8fc11b0811e0c29cc65835fac1c269124ba":50,"c4648b65117495f7e90393030c88847e285b9e1aea94745fb22e269e166b60d9":1,"c46a1125d67a53c982e2207d8d44809facae2fbeeb94776a5a859686af612141":20,"c46c552e933b1018aff6fa36cbc8cc7718c3df99b7ea3ecee0b0ee95cfac8d4c":1,"c4b38da92ccf89175ef419acb628def3ac23a5126005d57a0788c34eb5877852":20,"c51bb9abf79b3eac20e2ca3c646b05fe8f3cf08f3dafb653cd5d2cd9a069361e":50,"c61b0c636bbfa9dabb261b35555632e914edc5bbed868e21b4b3ada1996c4c54":1,"c64c85f803da9fb3e800671d9b471f0dadaa75d7b1e2ac3f2db7973bc25a16d4":20,"c8dcdb4f0c6b70668642320cfdf462699080bb093855204d0ffcf17aa9addf07":5,"c97a7fcb7ac626d6b1749f98d9f06b94b45df84ee49446771983ecb5f223e320":1,"c9dc75ee962dd37b6614e94398b8d42c6f92823dae33959470bc6164a1e319ed":1,"c9f55a83dfe386d32548669fbebab4b12cf421cfe8f83ecd56d699159ca3fae0":50,"caf5aee976e48b0a1d4a86ddb9735bf222376c698f9ef839a58388c1c1854161":5,"cb4790bb674c7b303ba4cacf3118425eba9b6819a7373708b0c4845b7711a83c":5,"cb8c7b722b2bc55e63fe52a4ecae5995193788a4988cd5eaf73b72fb238b34e4":5,"cbdfd4a2beb160777620e0a22cf5f7277ffedbe184cc482ed5d21be6ee73df6d":10,"cc733bf5385b16e0c131425bb6bb021af4298991638068d9984cf8cbe399075a":1,"cc7a167c727183ea02bb84b626cec581e97595d2b620f2de71d0882e04b33f83":1,"cd0ebd700b28a621749a76753641cb55977c99c0333f101e3ac833e3e45ce25d":20,"cd0f599993b2ab017cf38931d836858686118e8aa117d74d4493c09855e05526":50,"ce7bb5d33c64144e99d1a073f0416be0eadb60d57b4554aa67866f4a018bb39b":1,"d07c56c0190460cddf7050f649c8ed6cde76c953b1de55443d7eec9a4658e1eb":1,"d09f71ab1ba47a8ac667ca4ac3d05ba406399adaacfff9091472a576f1291e1d":1,"d0b368a295fd0814cd7c622cedffd5d5a1c5b7613982406b62003c3d47a11e3b":1,"d11788925a54ed0ccba18c44de2fd7cbdfe1a8565a5e40b791b51bd4c1adf21e":1,"d1312bfff967b96763f8457c7e2409191c21cd0ebeaa5a821f7f6d69b744e2de":20,"d147453812e135d6410b86949170c2d363bc7535fe49a36a92126582487a7b26":10,"d1f1d596f24def88bae39ee256ce58b0190eba6bd48ab33794a7a49cf2331bad":20,"d2915478d6721ab3e2ae06228db4f5c3d5ec2409eaf049c0b292a104e2a7d71c":5,"d2d0da8b222b52ed7d3fe1fc34171047aaab6736235148c30c7c3e20633bceb5":1,"d2e944e67a663a25f69f0f7f940718f7b49ba1f0cd175dc5957aeb685e94ab83":1,"d34f65db11f88f4f67972cbea626422b6b2afec577079fcde31092d3b4989e04":1,"d46b77b1c9168aa657e7ebab942f62a07ae13a3d154e3fb3655bef3a6b48c5c9":1,"d4808efe9918765ebd5808f9798004b4b076feff97240fe342879cb371bd647f":10,"d497016d38fa1256a4da4b05995907fbe4b5ffac8ededd1c163ac40545271531":10,"d50006d343cd7696177126fa4e435b680eff72523edd1199b8ad51366f32122e":1,"d5e19618f8b535f252133082ba26381baa0e02564e0e0f76c4dc404808ce5e03":5,"d634ed950f34c7d6865a6950e39118a813a5861e47581363e243a1c1cd14c37e":5,"d647cfd90ab224770f34d92758e7d7bcd35c687a5cf135c86782a67a0721abf4":10,"d71b820622a1ca051c93f83f67b4775a7ba275dbc2325746c08ad681de1b7027":1,"d77f5c345b9190c01598f482a3e709031c36e70a15d748489e4edf0c34267fa7":5,"d7b0eef04291e7f3ff165be1c6b76231c4d05d0e0f1513401587c6c057a793ef":1,"d7d9649df3a40189e595fd0f240b95172afb0d36bab2545e36d2a5dfaa474852":1,"d81fb34bb91bd2c9d37ce6d8dcc6051131c075fa5f122b7ce53dd026522934b6":20,"d9b230b5a30764f9fe7061a54e76dd35ba415767a2af8313c490fbeff8fda944":5,"da6aabc21d8fb24df6afc450e7ff86179a403ff93e354b1b2a95883d6baabf69":1,"daaadca6494cbefea4adfd4f74264c1762eacc314063c2b001496bb0ee5202d1":10,"dbd7cbc504665fe3a919e24ff24b591874fa926dcba4a60da043c0d9aed810f4":5,"dc0bad3fdb9dd1b346a08b4b576c8de1591ddb14c367267d3d46a2ba3972e777":1,"dc12a1ca0e75f25232f4e8e699a79a75d1e3152b04291e61206324b0c5b2ad37":20,"dcf51b1bea5f5e5f843f68e4d7e9c44978888d5dc508e6dbb02972b140f2069e":10,"dd0a4a86ab6ec0a71debf19ba8c4772804a7029a33fe64570814c1b7a1c66441":1,"dd851dfe7532066d16cb0d218eecca5a106a274cf00948597e0de2c3b92bf692":1,"de69d4d39af28a4c7d96239eb8fe7413c370eb089829d9ca4969cbbc5134bfe3":20,"dee3fa645c67f1af9bd75635dafb53da988ac98c17e6ae62c498923d59cf978c":5,"dee957786da809e25dd9b1ec3b909753424987e90d1cfcb08f1909ce10e4c518":1,"df7391eac3f4a1a1fbcadad053343866c6c42a3163cf6999c8ea1834209f5b2c":10,"e0d80383b2782338a09b80182261275b656e556a99c0e751c253556a79fb203c":5,"e16a4a1d0e5be1e536975220beab86bcf2f9e49df4d29263275d7e8196689471":5,"e19ce759c3fc5825c6f7d9912981be067be99d76bc1a0171b3e8580d8049399e":50,"e1ffafb2d958a16b2478d74aef9381da4189bb3d088a8646de8b2e123ca17d93":5,"e21a799b45478bf779e96ef2f1775638a1b1d2e944ecd5a8b2f01d4143c4d66b":1,"e32aa52752d9aa3cc3095bba4b5a2a27a547684533d821533695de59e5143c7f":1,"e4244282cfbd4738c720580ba53d9295fa0ac9cd441e53466101d2f5ca1400f8":10,"e54539e20acf5a7f5898e3e4264b601af2d2d34830d0236059070db0416fc942":5,"e6f29d3868fa68618a4521a268b28737c68f98e043017ad1e087600f60fe04e9":50,"e75cc00b6aecf34a01eb5ce94a3fe4aaeb665551679bce485c264bcaf38cb7a9":50,"e850aa940b9cf91d49cce8cef11f5dad406a8267cdccd501b31030b417db2c79":5,"e8c9f5cefbed90fff486fe234ecaa2bb1f759fae597ee9508d801430169f7c18":50,"e8cf69a4e186548c6b9e0d98a161031df3134139635afcbf20ac511ff3c661f8":1,"e91670ec37f0e09c305be9c046a926d876c8afafb39902565738cc93c617046d":1,"e955ed54e0681ea5cf4b7b8e449ba2fdaf44924aeb138a7e47df89dd84a6e84b":10,"eaed86a7a5d700dc40a6d02e75d0ab03eb3f1fdcdafaf75efe3a8d9c375e520e":50,"eb185b21170621bbe9b871f97fa15700c868872f4200cbc21ad5094bac2fef34":50,"eb4342d6eb952abacd37898dc601c73891355b1d2e09524ccf57c7cfe13e8752":1,"eb8d978977a9435f473caf67e54407afb90ba8e2cc657bb5f837993bc0763c35":20,"ecacbf5890681a8ebc88706afd15245b63de5b2ecd97283dcc69b4ab1535d8b5":20,"eef4774084e6d1fa3f932a801fcaadebfd81037fd8e1719fcb308cdefce04d12":20,"ef61eaeb641d18d3778cb23dc420a7a121a6c3915cc0c63211bdcc437a16a163":10,"efaf064d1dfd8827a6ec8868665a7be6f6e005d4b027be5106ddf235ef7f7d78":5,"efed99972e58cf7e913880c4e8cc20e1685abb21ca7776408c894acabd0e0385":1,"f120be8fcc56e5960151d6f7bf8b7c617a09177c023c1d0baace39a960798a68":5,"f1f38ff979b4a9dbee61730aecc5335c7b1e61e792bc509921feba6faa7c0530":10,"f1f854df7925ad95439a70f9a9d81da8f32814be03b116d447a58de8ed5fc43b":1,"f27b8a88e9466327e485c4ad974d600de4d0f19b0efae6bc21b29b62e8ccaa44":1,"f2e3ea4b660837d35f6d8d6e670568847a52b40940bff3b8238cf0d15d4869d1":5,"f36362832a8320a87c8f394fc9ff6c7f06e1e0cf51fc83a313675d1928e8849c":1,"f4a7fec10c0bc3c28d080cb10116a08df9099b4eed2af89905095aa26bf190e8":1,"f52af7bdad0eb5d5b70884cccece80a399a0507192acbb4f36eb40116e743f07":10,"f6d44ab862f286c26fd751cc88334bd1170ce63ff433575c98cde561f60c5871":50,"f6e7b83e15b1f8a5c3ae721e71a349f596839b64ccf7357435ddb8b95a8d7957":1,"f7591a3d3426ed9083a843d09c044aa034688ad4609dab398224d6b543a13b3c":5,"f7e0fd1fab7f9b8c78e13cf0f809aa4e5cd2539fe742509dd795f5ef81ea4ed5":10,"f882a0fa8ffe7a05c86d137972228e394caeb48ec5cf9c977ec97c6822ba5c62":1,"f8d49026f1b221a1add8f4fcc697314c926b0157a1ce1a89885d3097c8f10914":1,"f8e0ce867ddf8c236352427c81e353b2bb0549c99fc3894ea9111f891c0e7824":10,"f8ef39249eda5b4a3e78c06704ea425f397b2f543601b50217925b779c36c7a8":50,"f9bc661f16c2698ccdbdb67afc075648a716ad7584bed84e86a8d4605d371025":1,"f9f89f057375ad336f379f3b60ee14655e4dbe421a4afc37934463ce300b5066":10,"fb2e907161e238f520d58efbc4c64c94e0c22f50d5eedde08206577ea6da4166":5,"fb396c649ed4ed66eb52d1a72ef1473d742a9b1e852337d5aedd8a30a5bcffe2":20,"fb673ee43c77756c2b48c4f815103852d8c3fc5ef258faa8a8812083f874f150":1,"fc353f6751bda9a0caee654e1545baa2c315ea390c9768996f3d3259510cf842":10,"fc6eb1a80a569628186064e26596bbb7ec7db02266e123a17a46976539b29c0f":1,"ff7d017008aed7bb4422fb5e4e7a71318bd3ebde617a8f37c4ce5a9d6992a6dc":20,"ff96c3cfccb5b324e165985f4686867748227e3815c20774f9e94d86efc03ecd":10,"ffc539a2a1f92dabb0f01be420c6b25cd6d51efb8a1b4a5a6346c51c32171e69":10,"ffc98d11851a1d9d7ca608d29a54aba2f1fc3c0c9ab3aa6c9f2785bcffebcbff":5};
+
+        /* ---------- 按链接区分票 ----------
+           格式：?k=8 位票码（大写字母+数字）。票码转大写后算 SHA-256，
+           去内置哈希表查这张票的次数；查不到 -> 链接无效，锁住抽奖。
+           没有 k -> 默认 1 次（店主自测用）；带点号等其它格式一律无效。 */
+        function getRawTicket() {
+          try {
+            var params = new URLSearchParams(window.location.search);
+            var k = params.get("k");
+            if (k != null) {
+              k = String(k).trim();
+              if (k) return k;
+            }
+          } catch (e) {}
+          return null;
+        }
+        function parseTicket() {
+          var raw = getRawTicket();
+          if (!raw) return { valid: true, key: "__default__", total: 1 };
+          var code = raw.toUpperCase();
+          if (!/^[A-Z0-9]{8}$/.test(code)) return { valid: false, key: raw, total: 0 };
+          var hash = "";
+          try { hash = sha256Hex(code); } catch (e) { return { valid: false, key: raw, total: 0 }; }
+          var total = TICKET_HASHES[hash];
+          if (typeof total !== "number" || !(total >= 1)) return { valid: false, key: raw, total: 0 };
+          return { valid: true, key: code, total: total };
+        }
+        var TICKET = parseTicket();
+        var STORE_KEY = "muse-wheel-paidlink-v1";
+        var memoryStore = null;
+        function loadStore() {
+          var s = null;
+          try { var raw = localStorage.getItem(STORE_KEY); if (raw) s = JSON.parse(raw); } catch (e) {}
+          if (!s) s = memoryStore;
+          if (!s || typeof s !== "object") s = { tickets: {} };
+          if (!s.tickets || typeof s.tickets !== "object") s.tickets = {};
+          return s;
+        }
+        function saveStore(s) {
+          memoryStore = s;
+          try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {}
+        }
+        var store = loadStore();
+        /* 每个链接一条记录：{ draws: [每次结果...] }；兼容旧版单次结果格式 */
+        function getRecord() {
+          var v = store.tickets[TICKET.key];
+          if (!v || typeof v !== "object") return { draws: [] };
+          if (Array.isArray(v.draws)) return { draws: v.draws.filter(function (d) { return d && typeof d === "object" && typeof d.key === "string"; }) };
+          if (typeof v.key === "string") return { draws: [{ key: v.key, label: v.label, code: v.code || null, seg: v.seg, rotation: v.rotation, time: v.time }] };
+          return { draws: [] };
+        }
+        function remaining() { return Math.max(0, TICKET.total - getRecord().draws.length); }
+
+        function drawPrize() {
+          var r = Math.random() * 100, acc = 0;
+          for (var i = 0; i < PRIZES.length; i++) { acc += PRIZES[i].prob; if (r < acc) return PRIZES[i]; }
+          return PRIZES[PRIZES.length - 1];
+        }
+        function makeCode() {
+          var letters = "ABCDEFGHJKMNPQRSTUVWXYZ", digits = "23456789", pool = letters + digits;
+          var chars = [
+            letters.charAt(Math.floor(Math.random() * letters.length)),
+            letters.charAt(Math.floor(Math.random() * letters.length)),
+            digits.charAt(Math.floor(Math.random() * digits.length)),
+            digits.charAt(Math.floor(Math.random() * digits.length)),
+            pool.charAt(Math.floor(Math.random() * pool.length))
+          ];
+          for (var i = chars.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = chars[i]; chars[i] = chars[j]; chars[j] = t; }
+          return "666" + chars.join("");
+        }
+
+        var wheelEl = document.getElementById("wheel");
+        var spinBtn = document.getElementById("spinBtn");
+        var onceNote = document.getElementById("onceNote");
+        var ticketStatus = document.getElementById("ticketStatus");
+        var resultCard = document.getElementById("resultCard");
+        var historyCard = document.getElementById("historyCard");
+        var historyList = document.getElementById("historyList");
+        var currentRotation = 0;
+        var initRecord = getRecord();
+        var lastDraw = initRecord.draws.length ? initRecord.draws[initRecord.draws.length - 1] : null;
+        if (lastDraw && typeof lastDraw.rotation === "number") currentRotation = lastDraw.rotation;
+        var spinning = false;
+        var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function segmentIndexFor(key) { var list = SEG_BY_KEY[key]; return list[Math.floor(Math.random() * list.length)]; }
+        function rotationFor(index, base) {
+          var center = index * 45 + 22.5;
+          var targetMod = (360 - center) % 360;
+          var curMod = ((base % 360) + 360) % 360;
+          var delta = (targetMod - curMod + 360) % 360;
+          return base + 360 * 6 + delta;
+        }
+        function setWheel(rotation, animate) {
+          wheelEl.classList.remove("spinning", "spinning-fast");
+          if (animate) { void wheelEl.getBoundingClientRect(); wheelEl.classList.add(reducedMotion ? "spinning-fast" : "spinning"); }
+          wheelEl.style.transform = "rotate(" + rotation + "deg)";
+          currentRotation = rotation;
+        }
+        function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+        function updateControls() {
+          if (!TICKET.valid) {
+            ticketStatus.textContent = "链接无效，请联系店主";
+            ticketStatus.classList.add("invalid");
+            spinBtn.disabled = true; spinBtn.textContent = "链接无效";
+            onceNote.textContent = "这个链接打不开抽奖，请联系店主重新发送。";
+            return;
+          }
+          ticketStatus.classList.remove("invalid");
+          var left = remaining();
+          ticketStatus.innerHTML = "本链接共 " + TICKET.total + " 次 · 还剩 <span class=\"left\">" + left + " 次</span>";
+          if (spinning) { spinBtn.disabled = true; spinBtn.textContent = "抽奖中…"; return; }
+          if (left > 0) {
+            var used = getRecord().draws.length;
+            spinBtn.disabled = false;
+            spinBtn.textContent = used === 0 ? "开始抽奖" : "再抽一次（还剩 " + left + " 次）";
+            onceNote.textContent = "本页为付费抽奖（¥0.1 一次），中奖凭码领奖，抽一次少一次";
+          } else {
+            spinBtn.disabled = true; spinBtn.textContent = "次数已用完";
+            onceNote.textContent = "本链接的次数已全部抽完，全部结果在下方记录里";
+          }
+        }
+
+        function bindCopy(btn, code) {
+          btn.addEventListener("click", function () {
+            function done() { btn.textContent = "已复制"; setTimeout(function () { btn.textContent = "复制"; }, 1600); }
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(code).then(done, function () { fallbackCopy(code); done(); }); } else { fallbackCopy(code); done(); }
+          });
+        }
+
+        function showResult(data, index) {
+          var win = data.key !== "0";
+          var tag = index ? "第 " + index + " 次 · " : "";
+          var html = "";
+          if (win) {
+            html += '<span class="result-badge win">' + esc(tag) + '恭喜中奖</span>';
+            html += '<p class="result-prize">' + esc(data.label) + ' <span class="unit">token</span></p>';
+            html += '<p class="result-msg">你的专属中奖码：</p>';
+            html += '<div class="code-row"><div class="code-box">' + esc(data.code) + '</div><button class="copy-btn" id="copyBtn" type="button">复制</button></div>';
+            html += '<p class="result-tip">请截图保存，私聊店主凭中奖码领取额度；全部中奖码也在下方记录里。</p>';
+          } else {
+            html += '<span class="result-badge lose">' + esc(tag) + '谢谢参与</span>';
+            html += '<p class="result-prize">就差一点</p>';
+            html += '<p class="result-msg">这次没有抽中额度。感谢参与！</p>';
+          }
+          resultCard.innerHTML = html;
+          resultCard.hidden = false;
+          if (win) bindCopy(document.getElementById("copyBtn"), data.code);
+        }
+
+        function renderHistory() {
+          var draws = getRecord().draws;
+          if (!draws.length) { historyCard.hidden = true; historyList.innerHTML = ""; return; }
+          var html = "";
+          draws.forEach(function (d, i) {
+            html += "<li>";
+            html += '<span class="history-no">第 ' + (i + 1) + " 次</span>";
+            if (d.key !== "0") {
+              html += '<span class="history-prize">' + esc(d.label) + " token</span>";
+              html += '<span class="history-code"><span class="code-text">' + esc(d.code) + '</span><button class="history-copy" type="button" data-code="' + esc(d.code) + '">复制</button></span>';
+            } else {
+              html += '<span class="history-prize miss">未中奖</span>';
+            }
+            html += "</li>";
+          });
+          historyList.innerHTML = html;
+          historyCard.hidden = false;
+          var btns = historyList.querySelectorAll(".history-copy");
+          for (var i = 0; i < btns.length; i++) bindCopy(btns[i], btns[i].getAttribute("data-code"));
+        }
+
+        function showInvalid() {
+          resultCard.innerHTML = '<span class="result-badge lose">链接无效</span><p class="result-prize">打不开这次抽奖</p><p class="result-msg">链接无效，请联系店主重新发送。</p>';
+          resultCard.hidden = false;
+        }
+        function fallbackCopy(text) {
+          var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta);
+        }
+
+        spinBtn.addEventListener("click", function () {
+          if (spinning || !TICKET.valid) return;
+          store = loadStore();
+          if (remaining() <= 0) { updateControls(); renderHistory(); return; }
+          spinning = true; updateControls();
+          var prize = drawPrize();
+          var segIndex = segmentIndexFor(prize.key);
+          var data = { key: prize.key, label: prize.label, code: prize.key !== "0" ? makeCode() : null, seg: segIndex, rotation: rotationFor(segIndex, currentRotation), time: Date.now() };
+          /* 先落盘扣次，再展示结果：刷新也不会把这次还回来 */
+          var rec = getRecord();
+          rec.draws.push(data);
+          store.tickets[TICKET.key] = { draws: rec.draws };
+          saveStore(store);
+          var drawIndex = rec.draws.length;
+          setWheel(data.rotation, true);
+          var finishDelay = reducedMotion ? 800 : 5600;
+          setTimeout(function () {
+            spinning = false; updateControls(); showResult(data, drawIndex); renderHistory();
+            if (navigator.vibrate) { try { navigator.vibrate(data.key !== "0" ? [60, 40, 60] : 40); } catch (e) {} }
+            resultCard.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+          }, finishDelay);
+        });
+
+        buildWheel();
+        if (!TICKET.valid) { showInvalid(); }
+        else if (lastDraw) { setWheel(lastDraw.rotation, false); showResult(lastDraw, initRecord.draws.length); }
+        renderHistory();
+        updateControls();
+      })();
+    </script>
+  </body>
+</html>
